@@ -25,3 +25,7 @@ springdoc:
     path: /v1/api-docs
   swagger-ui:
     path: /docs
+
+logging:
+  level:
+    com.diploma.skillboxjavaspring: DEBUG

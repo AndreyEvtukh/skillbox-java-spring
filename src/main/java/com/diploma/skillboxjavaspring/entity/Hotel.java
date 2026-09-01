@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -66,4 +67,10 @@ public class Hotel {
      */
     @Column(name = "rating_count")
     private Integer ratingCount = 0;
+
+    /**
+     * Rooms belonging to this hotel.
+     */
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Room> rooms;
 }
