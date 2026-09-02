@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Provides persistence operations for {@link Hotel} entities.
+ */
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, UUID> {
 }

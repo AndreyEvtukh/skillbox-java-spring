@@ -1,4 +1,4 @@
-package com.diploma.skillboxjavaspring.exeptions;
+package com.diploma.skillboxjavaspring.exceptions;
 
 import java.util.UUID;
 

@@ -3,7 +3,7 @@ package com.diploma.skillboxjavaspring.services;
 import com.diploma.skillboxjavaspring.dto.HotelRequestDTO;
 import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
 import com.diploma.skillboxjavaspring.entity.Hotel;
-import com.diploma.skillboxjavaspring.exeptions.HotelNotFoundException;
+import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
 import com.diploma.skillboxjavaspring.mapper.HotelMapper;
 import com.diploma.skillboxjavaspring.repositories.HotelRepository;
 import lombok.RequiredArgsConstructor;

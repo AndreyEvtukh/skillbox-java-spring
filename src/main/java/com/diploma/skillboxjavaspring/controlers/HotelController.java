@@ -137,6 +137,15 @@ public class HotelController {
      * @param hotelRequestDTO the data containing the hotel's updated values
      * @return an {@code OK} response containing the updated hotel
      */
+    @Operation(
+            summary = "Update hotel",
+            description = "Updates an existing hotel and returns the updated hotel."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Hotel updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Incorrect input data"),
+            @ApiResponse(responseCode = "404", description = "Hotel not found")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<HotelResponseDTO> update(
             @Parameter(description = "Unique hotel identifier", required = true)
@@ -153,6 +162,14 @@ public class HotelController {
      * @param ID the unique identifier of the hotel to delete
      * @return a {@code 204 No Content} response after deletion
      */
+    @Operation(
+            summary = "Delete hotel",
+            description = "Deletes the hotel with the supplied unique identifier."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Hotel deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Hotel not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable("id") UUID ID

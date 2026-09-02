@@ -5,8 +5,8 @@ import com.diploma.skillboxjavaspring.dto.RoomResponseDTO;
 import com.diploma.skillboxjavaspring.dto.RoomUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import com.diploma.skillboxjavaspring.entity.Room;
-import com.diploma.skillboxjavaspring.exeptions.HotelNotFoundException;
-import com.diploma.skillboxjavaspring.exeptions.RoomNotFoundException;
+import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
+import com.diploma.skillboxjavaspring.exceptions.RoomNotFoundException;
 import com.diploma.skillboxjavaspring.mapper.RoomMapper;
 import com.diploma.skillboxjavaspring.repositories.HotelRepository;
 import com.diploma.skillboxjavaspring.repositories.RoomRepository;
@@ -74,7 +74,8 @@ public class RoomService {
     public RoomResponseDTO create(RoomRequestDTO roomRequestDTO) {
         log.warn("=> Add new room {}", roomRequestDTO);
 
-        Hotel hotel = hotelRepository.findById(roomRequestDTO.getHotelId())
+        Hotel hotel = hotelRepository
+                .findById(roomRequestDTO.getHotelId())
                 .orElseThrow(() ->
                         new HotelNotFoundException(roomRequestDTO.getHotelId()));
 
