@@ -1,17 +1,23 @@
 package com.diploma.skillboxjavaspring.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
- * Represents an error returned to the client.
+ * Response data returned when processing a request results in an error.
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorResponseDTO {
 
+    /**
+     * HTTP status code associated with the error.
+     */
     private int status;
+
+    /**
+     * Human-readable description of the error.
+     */
     private String message;
 }

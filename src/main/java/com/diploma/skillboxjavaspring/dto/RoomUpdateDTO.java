@@ -11,26 +11,41 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Carries the validated data used to update an existing room.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Data for updating a room")
 public class RoomUpdateDTO {
 
+    /**
+     * The room's updated name.
+     */
     @NotBlank(message = "Name can not be blank")
     @Schema(description = "Room name", example = "Lux")
     private String name;
 
+    /**
+     * The room's updated number.
+     */
     @NotNull(message = "Number can not be null")
     @Positive(message = "Number must be greater than zero")
     @Schema(description = "Room number", example = "12")
     private Integer number;
 
+    /**
+     * The room's updated nightly price.
+     */
     @NotNull(message = "Price can not be null")
     @Positive(message = "Price must be greater than zero")
     @Schema(description = "Room price", example = "1280")
     private Integer price;
 
+    /**
+     * The updated maximum number of guests the room accommodates.
+     */
     @NotNull(message = "Max capacity can not be null")
     @Positive(message = "Max capacity must be greater than zero")
     @Schema(
@@ -39,6 +54,9 @@ public class RoomUpdateDTO {
     )
     private Integer maxCapacity;
 
+    /**
+     * The room's updated description.
+     */
     @NotBlank(message = "Description can not be blank")
     @Schema(
             description = "Room description",
@@ -46,6 +64,9 @@ public class RoomUpdateDTO {
     )
     private String description;
 
+    /**
+     * Dates on which the room is unavailable.
+     */
     @Schema(
             description = "Dates when the room is unavailable",
             example = "[\"2026-09-10\", \"2026-09-11\"]"
