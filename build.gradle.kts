@@ -31,8 +31,9 @@ dependencies {
     // implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
-
     implementation("org.springframework.boot:spring-boot-starter-flyway")
+
+    // Security
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     // MapStruct
