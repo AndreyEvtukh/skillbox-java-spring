@@ -52,10 +52,12 @@ public class RoomService {
      */
     @Transactional(readOnly = true)
     public RoomResponseDTO getById(UUID ID) {
-        log.warn("=> Find room by ID {}", ID);
+        log.debug("=> Find room by ID {}", ID);
 
         Room room = roomRepository.findById(ID)
                 .orElseThrow(() -> new RoomNotFoundException(ID));
+
+        log.debug("<= Room {}", room);
 
         return roomMapper.toResponseDTO(room);
     }
@@ -72,7 +74,7 @@ public class RoomService {
      */
     @Transactional
     public RoomResponseDTO create(RoomRequestDTO roomRequestDTO) {
-        log.warn("=> Add new room {}", roomRequestDTO);
+        log.debug("=> Add new room {}", roomRequestDTO);
 
         Hotel hotel = hotelRepository
                 .findById(roomRequestDTO.getHotelId())
@@ -84,7 +86,7 @@ public class RoomService {
         room.setHotel(hotel);
         Room saved = roomRepository.save(room);
 
-        log.warn("=> Saved room {}", saved);
+        log.debug("<= Saved room {}", saved);
 
         return roomMapper.toResponseDTO(saved);
     }
@@ -99,7 +101,7 @@ public class RoomService {
      */
     @Transactional
     public RoomResponseDTO update(UUID ID, RoomUpdateDTO roomUpdateDTO) {
-        log.warn("=> Update room {}", roomUpdateDTO);
+        log.debug("=> Update room {}", roomUpdateDTO);
 
         Room room = roomRepository.findById(ID)
                 .orElseThrow(() -> new RoomNotFoundException(ID));
@@ -108,7 +110,7 @@ public class RoomService {
         roomMapper.updateEntity(roomUpdateDTO, room);
         Room updated = roomRepository.save(room);
 
-        log.warn("=> Updated room {}", updated);
+        log.debug("<= Updated room {}", updated);
 
         return roomMapper.toResponseDTO(updated);
     }
@@ -121,10 +123,12 @@ public class RoomService {
      */
     @Transactional
     public void deleteById(UUID ID) {
-        log.warn("=> Delete room by ID {}", ID);
+        log.debug("=> Delete room by ID {}", ID);
 
         Room room = roomRepository.findById(ID)
                 .orElseThrow(() -> new RoomNotFoundException(ID));
+
+        log.debug("<= Delete {}: SUCCESS", ID);
 
         roomRepository.delete(room);
     }

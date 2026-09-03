@@ -13,17 +13,3 @@ CREATE TABLE IF NOT EXISTS rooms
             REFERENCES hotels (id)
             ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS room_closed_dates
-(
-    room_id     UUID NOT NULL,
-    closed_date DATE NOT NULL,
-
-    CONSTRAINT fk_room_closed_dates_room
-        FOREIGN KEY (room_id)
-            REFERENCES rooms (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT uq_room_closed_date
-        UNIQUE (room_id, closed_date)
-);

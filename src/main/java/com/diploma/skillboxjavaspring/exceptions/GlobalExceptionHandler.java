@@ -24,7 +24,8 @@ public class GlobalExceptionHandler {
             HotelNotFoundException.class,
             UserEmailNotFoundException.class,
             UserNameNotFoundException.class,
-            UserIDNotFoundException.class
+            UserIDNotFoundException.class,
+            RoomNotFoundException.class
     })
     public ResponseEntity<ErrorResponseDTO> handleNotFound(
             RuntimeException exception
@@ -98,5 +99,22 @@ public class GlobalExceptionHandler {
                         status.value(),
                         message
                 ));
+    }
+
+    /**
+     * Handles attempts to book a room that is already booked
+     * for the requested dates.
+     *
+     * @param exception the exception describing the booking conflict
+     * @return a response with HTTP 409 status
+     */
+    @ExceptionHandler(RoomAlreadyBookedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleRoomAlreadyBooked(
+            RoomAlreadyBookedException exception
+    ) {
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage()
+        );
     }
 }

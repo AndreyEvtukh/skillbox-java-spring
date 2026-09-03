@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,20 +56,12 @@ public class Room {
     private String description;
 
     /**
-     * Dates on which the room cannot be booked.
-     */
-    @ElementCollection
-    @CollectionTable(
-            name = "room_closed_dates",
-            joinColumns = @JoinColumn(name = "room_id")
-    )
-    @Column(name = "closed_date")
-    private List<LocalDate> closedDates;
-
-    /**
      * The hotel to which this room belongs.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="hotel_id", nullable = false)
     private Hotel hotel;
+
+    @OneToMany(mappedBy = "room")
+    private List<Booking> bookings;
 }

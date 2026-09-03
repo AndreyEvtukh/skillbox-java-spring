@@ -118,7 +118,7 @@ public class HotelController {
     public ResponseEntity<HotelResponseDTO> create(
             @Valid @RequestBody HotelRequestDTO hotelRequestDTO
     ) {
-        log.error("=> create {}", hotelRequestDTO);
+        log.debug("=> create {}", hotelRequestDTO);
         HotelResponseDTO saved = hotelService.create(hotelRequestDTO);
 
         URI location = ServletUriComponentsBuilder

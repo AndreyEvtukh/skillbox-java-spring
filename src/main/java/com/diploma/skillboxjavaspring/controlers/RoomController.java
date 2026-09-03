@@ -93,7 +93,6 @@ public class RoomController {
                                         "price": "1280",
                                         "maxCapacity": "4",
                                         "description": "Comfortable room",
-                                        "closedDates": []
                                         "hotelId": "27117d7b-0a5a-4623-8cf0-eaf9091ad969"
                                     }
                                     """))
