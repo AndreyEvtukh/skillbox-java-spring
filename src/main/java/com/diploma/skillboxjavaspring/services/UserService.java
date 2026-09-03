@@ -37,7 +37,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserResponseDTO getByUsername(String username) {
-        log.warn("=> Find user by name {}", username);
+        log.debug("=> Find user by name {}", username);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNameNotFoundException(username));
@@ -55,7 +55,7 @@ public class UserService {
      */
     @Transactional
     public UserResponseDTO create(UserRequestDTO userRequestDTO) {
-        log.warn("=> Add new user {}", userRequestDTO);
+        log.debug("=> Add new user {}", userRequestDTO);
 
         if (userRepository.existsByUsername(userRequestDTO.getUsername())) {
             throw new UserNameExistedException(userRequestDTO.getUsername());
@@ -68,7 +68,7 @@ public class UserService {
         User user = userMapper.toEntity(userRequestDTO);
         User saved = userRepository.save(user);
 
-        log.warn("<= Saved user {}", saved);
+        log.debug("<= Saved user {}", saved);
 
         return userMapper.toResponseDTO(saved);
     }
@@ -85,7 +85,7 @@ public class UserService {
      */
     @Transactional
     public UserResponseDTO update(UUID id, UserUpdateDTO userUpdateDTO) {
-        log.warn("=> Update user {}", userUpdateDTO);
+        log.debug("=> Update user {}", userUpdateDTO);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserIDNotFoundException(id));
@@ -102,7 +102,7 @@ public class UserService {
 
         User updated = userRepository.save(user);
 
-        log.warn("<= Updated user {}", updated);
+        log.debug("<= Updated user {}", updated);
 
         return userMapper.toResponseDTO(updated);
     }
@@ -115,7 +115,7 @@ public class UserService {
      */
     @Transactional
     public void delete(UUID id) {
-        log.warn("=> Delete user by ID {}", id);
+        log.debug("=> Delete user by ID {}", id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserIDNotFoundException(id));

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -67,6 +66,6 @@ public class RoomResponseDTO {
     /**
      * Dates on which the room is unavailable; may be omitted when there are none.
      */
-    @Schema(description = "List of dates when the room is unavailable", example = "[2021-09-10]")
-    private List<LocalDate> closedDates = new ArrayList<>();
+    @Schema(description = "List of dates when the room is booked", example = "[]")
+    private List<BookingPeriodDTO> bookingPeriods = new ArrayList<>();
 }

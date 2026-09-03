@@ -1,12 +1,16 @@
 package com.diploma.skillboxjavaspring.mapper;
 
+import com.diploma.skillboxjavaspring.dto.BookingPeriodDTO;
 import com.diploma.skillboxjavaspring.dto.RoomRequestDTO;
 import com.diploma.skillboxjavaspring.dto.RoomResponseDTO;
 import com.diploma.skillboxjavaspring.dto.RoomUpdateDTO;
+import com.diploma.skillboxjavaspring.entity.Booking;
 import com.diploma.skillboxjavaspring.entity.Room;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+
+import java.util.List;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
@@ -32,16 +36,24 @@ public interface RoomMapper {
     @Mapping(target = "hotel", ignore = true)
     Room toEntity(RoomRequestDTO dto);
 
-    /**
-     * Converts the supplied room entity to its API response DTO.
-     *
-     * <p>The identifier of the associated hotel is mapped to {@code hotelId}.</p>
-     *
-     * @param room the room entity to convert
-     * @return a response DTO containing the room data and associated hotel identifier
-     */
+
     @Mapping(target = "hotelId", source = "hotel.id")
+    @Mapping(target = "bookingPeriods", source = "bookings")
     RoomResponseDTO toResponseDTO(Room room);
+
+    default List<BookingPeriodDTO> mapBookingPeriods(List<Booking> bookings) {
+
+        if (bookings == null) {
+            return List.of();
+        }
+
+        return bookings.stream()
+                .map(booking -> new BookingPeriodDTO(
+                        booking.getCheckIn(),
+                        booking.getCheckOut().minusDays(1)
+                ))
+                .toList();
+    }
 
     /**
      * Updates an existing room entity using values from an update DTO.

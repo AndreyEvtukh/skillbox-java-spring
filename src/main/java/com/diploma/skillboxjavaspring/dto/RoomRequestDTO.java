@@ -1,5 +1,6 @@
 package com.diploma.skillboxjavaspring.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -65,7 +66,8 @@ public class RoomRequestDTO {
     /**
      * Dates on which the room is unavailable; may be omitted when there are none.
      */
-    @Schema(description = "Dates when the room is unavailable", example = "[\"2026-09-10\", \"2026-09-11\"]")
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<LocalDate> closedDates;
 
     /**
