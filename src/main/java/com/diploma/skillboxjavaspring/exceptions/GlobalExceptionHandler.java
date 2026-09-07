@@ -64,7 +64,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({
             UserNameExistedException.class,
-            UserEmailExistedException.class
+            UserEmailExistedException.class,
+            InvalidHotelRatingException.class
     })
     public ResponseEntity<ErrorResponseDTO> handleUserExists(
             RuntimeException exception
@@ -90,19 +91,12 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(InvalidLoginEmailException.class)
+    @ExceptionHandler({
+            InvalidLoginEmailException.class,
+            InvalidLoginPasswordException.class
+    })
     public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(
-            InvalidLoginEmailException exception
-    ) {
-        return buildErrorResponse(
-                HttpStatus.UNAUTHORIZED,
-                exception.getMessage()
-        );
-    }
-
-    @ExceptionHandler(InvalidLoginPasswordException.class)
-    public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(
-            InvalidLoginPasswordException exception
+            RuntimeException exception
     ) {
         return buildErrorResponse(
                 HttpStatus.UNAUTHORIZED,

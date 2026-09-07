@@ -78,5 +78,5 @@ public class HotelResponseDTO {
      */
     @NotNull(message = "Rating count can not be null")
     @Schema(example = "125")
-    private Integer ratingCount;
+    private Integer numOfRating;
 }

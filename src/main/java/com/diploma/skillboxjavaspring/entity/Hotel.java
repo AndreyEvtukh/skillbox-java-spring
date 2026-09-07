@@ -65,8 +65,8 @@ public class Hotel {
     /**
      * Number of ratings included in the current average, initialized to zero.
      */
-    @Column(name = "rating_count")
-    private Integer ratingCount = 0;
+    @Column(name = "num_of_rating")
+    private Integer numOfRating = 0;
 
     /**
      * Rooms belonging to this hotel.

@@ -28,7 +28,7 @@ public interface HotelMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rating", ignore = true)
-    @Mapping(target = "ratingCount", ignore = true)
+    @Mapping(target = "numOfRating", ignore = true)
     @Mapping(target = "rooms", ignore = true)
     Hotel toEntity(HotelRequestDTO dto);
 
@@ -49,7 +49,7 @@ public interface HotelMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rating", ignore = true)
-    @Mapping(target = "ratingCount", ignore = true)
+    @Mapping(target = "numOfRating", ignore = true)
     @Mapping(target = "rooms", ignore = true)
     void updateEntity(HotelRequestDTO dto, @MappingTarget Hotel hotel);
 }
