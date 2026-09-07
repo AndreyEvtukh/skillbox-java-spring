@@ -28,4 +28,5 @@ springdoc:
 
 logging:
   level:
+#    org.hibernate.SQL: DEBUG
     com.diploma.skillboxjavaspring: DEBUG

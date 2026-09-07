@@ -37,6 +37,9 @@ public class User {
     @Column(name = "username")
     private String username;
 
+    @Column(name = "active")
+    private Boolean active;
+
     /**
      * Hashed password used to authenticate the user.
      */

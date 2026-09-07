@@ -3,6 +3,7 @@ package com.diploma.skillboxjavaspring.services;
 import com.diploma.skillboxjavaspring.dto.UserRequestDTO;
 import com.diploma.skillboxjavaspring.dto.UserResponseDTO;
 import com.diploma.skillboxjavaspring.dto.UserUpdateDTO;
+import com.diploma.skillboxjavaspring.entity.Role;
 import com.diploma.skillboxjavaspring.entity.User;
 import com.diploma.skillboxjavaspring.exceptions.UserEmailExistedException;
 import com.diploma.skillboxjavaspring.exceptions.UserIDNotFoundException;
@@ -12,9 +13,11 @@ import com.diploma.skillboxjavaspring.mapper.UserMapper;
 import com.diploma.skillboxjavaspring.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -27,6 +30,24 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Retrieves all users.
+     *
+     * @return the list of all user data
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> getAll() {
+        log.debug("=> Get all users");
+
+        List<UserResponseDTO> users = userRepository.findAll()
+                .stream()
+                .map(userMapper::toResponseDTO)
+                .toList();
+
+        return users;
+    }
 
     /**
      * Retrieves a user by username.
@@ -50,7 +71,7 @@ public class UserService {
      *
      * @param userRequestDTO the data for the user to create
      * @return the persisted user data
-     * @throws UserNameExistedException if the username is already in use
+     * @throws UserNameExistedException  if the username is already in use
      * @throws UserEmailExistedException if the email address is already in use
      */
     @Transactional
@@ -65,7 +86,12 @@ public class UserService {
             throw new UserEmailExistedException(userRequestDTO.getEmail());
         }
 
-        User user = userMapper.toEntity(userRequestDTO);
+        User user = new User();
+        user.setUsername(userRequestDTO.getUsername());
+        user.setEmail(userRequestDTO.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(userRequestDTO.getPassword()));
+        user.setRole(Role.USER);
+        user.setActive(false);
         User saved = userRepository.save(user);
 
         log.debug("<= Saved user {}", saved);
@@ -76,11 +102,11 @@ public class UserService {
     /**
      * Updates an existing user.
      *
-     * @param id the unique ID of the user to update
+     * @param id            the unique ID of the user to update
      * @param userUpdateDTO the updated user data
      * @return the updated user data
-     * @throws UserIDNotFoundException if no user has the specified ID
-     * @throws UserNameExistedException if the username is already in use
+     * @throws UserIDNotFoundException   if no user has the specified ID
+     * @throws UserNameExistedException  if the username is already in use
      * @throws UserEmailExistedException if the email address is already in use
      */
     @Transactional
@@ -90,21 +116,14 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserIDNotFoundException(id));
 
-        if (userRepository.existsByUsername(userUpdateDTO.getUsername())) {
-            throw new UserNameExistedException(userUpdateDTO.getUsername());
-        }
-
-        if (userRepository.existsByEmail(userUpdateDTO.getEmail())) {
-            throw new UserEmailExistedException(userUpdateDTO.getEmail());
-        }
-
         userMapper.updateEntity(userUpdateDTO, user);
-
         User updated = userRepository.save(user);
 
-        log.debug("<= Updated user {}", updated);
+        UserResponseDTO userResponseDTO = userMapper.toResponseDTO(updated);
+        userResponseDTO.setEvent("Edit");
+        log.debug("<= Updated user {}", userResponseDTO);
 
-        return userMapper.toResponseDTO(updated);
+        return userResponseDTO;
     }
 
     /**
@@ -121,5 +140,27 @@ public class UserService {
                 .orElseThrow(() -> new UserIDNotFoundException(id));
 
         userRepository.delete(user);
+    }
+
+    /**
+     * Updates a user's active status.
+     *
+     * @param id     the unique ID of the user to update
+     * @param active the new active status
+     * @return the updated user data
+     * @throws UserIDNotFoundException if no user has the specified ID
+     */
+    @Transactional
+    public UserResponseDTO updateStatus(UUID id, Boolean active) {
+        log.debug("=> Set user status by ID {}: {}", id, active);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserIDNotFoundException(id));
+        user.setActive(active);
+        userRepository.flush();
+
+        UserResponseDTO userResponseDTO = userMapper.toResponseDTO(user);
+
+        return userResponseDTO;
     }
 }

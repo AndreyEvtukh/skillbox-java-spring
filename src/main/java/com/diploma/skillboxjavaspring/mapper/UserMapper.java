@@ -33,9 +33,9 @@ public interface UserMapper {
     /**
      * Updates a user entity with the supplied update data, preserving its password hash.
      *
-     * @param dto the user update data
+     * @param dto  the user update data
      * @param user the entity to update
      */
     @Mapping(target = "passwordHash", ignore = true)
-    void updateEntity(UserUpdateDTO dto, @MappingTarget User user);
+    User updateEntity(UserUpdateDTO dto, @MappingTarget User user);
 }
