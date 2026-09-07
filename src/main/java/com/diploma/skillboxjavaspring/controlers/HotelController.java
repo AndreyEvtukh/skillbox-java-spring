@@ -1,8 +1,7 @@
 package com.diploma.skillboxjavaspring.controlers;
 
-import com.diploma.skillboxjavaspring.dto.HotelRatingRequestDTO;
-import com.diploma.skillboxjavaspring.dto.HotelRequestDTO;
-import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
+import com.diploma.skillboxjavaspring.dto.HotelPageResponseDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.*;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
 import com.diploma.skillboxjavaspring.exceptions.InvalidHotelRatingException;
 import com.diploma.skillboxjavaspring.services.HotelService;
@@ -16,11 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Collection;
 import java.util.UUID;
@@ -194,7 +197,7 @@ public class HotelController {
      * @param ID                    the unique identifier of the hotel to update
      * @param hotelRatingRequestDTO the data containing the new hotel rating
      * @return an {@code OK} response containing the updated hotel
-     * @throws HotelNotFoundException if no hotel exists with the specified identifier
+     * @throws HotelNotFoundException      if no hotel exists with the specified identifier
      * @throws InvalidHotelRatingException if the rating is outside the supported range
      */
     @Operation(
@@ -214,5 +217,104 @@ public class HotelController {
     ) {
         HotelResponseDTO updated = hotelService.updateRating(ID, hotelRatingRequestDTO);
         return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Retrieves a paginated and sorted collection of hotels matching the supplied filters.
+     *
+     * @param name             optional hotel name filter
+     * @param title            optional hotel title filter
+     * @param city             optional city filter
+     * @param address          optional address filter
+     * @param distanceToCenter optional maximum distance from the city center
+     * @param rating           optional minimum hotel rating
+     * @param numOfRating      optional minimum number of ratings
+     * @param page             zero-based page number
+     * @param size             number of hotels per page
+     * @param sort             sorting expression in the format {@code property,direction}
+     * @return a page of hotels matching the supplied criteria
+     */
+    @Operation(
+            summary = "Get hotels",
+            description = """
+                Returns a paginated list of hotels with filtering support.
+                
+                The following filters are supported:
+                - hotel name;
+                - title;
+                - city;
+                - address;
+                - distance to the city center;
+                - rating;
+                - number of ratings.
+                
+                The response contains the hotels on the current page
+                and the total number of matching hotels.
+                """
+    )
+    @GetMapping
+    public HotelPageResponseDTO getHotels(
+            @Parameter(description = "Hotel name")
+            @RequestParam(required = false) String name,
+
+            @Parameter(description = "Hotel title")
+            @RequestParam(required = false) String title,
+
+            @Parameter(description = "City")
+            @RequestParam(required = false) String city,
+
+            @Parameter(description = "Hotel address")
+            @RequestParam(required = false) String address,
+
+            @Parameter(description = "Distance to the city center")
+            @RequestParam(required = false) BigDecimal distanceToCenter,
+
+            @Parameter(description = "Hotel rating")
+            @RequestParam(required = false) BigDecimal rating,
+
+            @Parameter(description = "Number of ratings")
+            @RequestParam(required = false) Integer numOfRating,
+
+            @Parameter(
+                    description = "Page number. Numbering starts from 0",
+                    example = "0"
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "Number of hotels per page",
+                    example = "10"
+            )
+            @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(
+                    description = "Sorting in the format: field,direction. For example: name,asc or rating,desc",
+                    example = "name,asc"
+            )
+            @RequestParam(defaultValue = "name,asc") String sort
+    ) {
+        HotelFilterDTO filter = new HotelFilterDTO(
+                name,
+                title,
+                city,
+                address,
+                distanceToCenter,
+                rating,
+                numOfRating
+        );
+
+        String[] sortParts = sort.split(",", 2);
+
+        Sort.Direction direction = sortParts.length > 1
+                ? Sort.Direction.fromString(sortParts[1])
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(direction, sortParts[0])
+        );
+
+        return hotelService.findHotels(filter, pageable);
     }
 }

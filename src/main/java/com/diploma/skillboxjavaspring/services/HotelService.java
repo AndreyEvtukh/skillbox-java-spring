@@ -1,15 +1,18 @@
 package com.diploma.skillboxjavaspring.services;
 
-import com.diploma.skillboxjavaspring.dto.HotelRatingRequestDTO;
-import com.diploma.skillboxjavaspring.dto.HotelRequestDTO;
-import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
+import com.diploma.skillboxjavaspring.dto.HotelPageResponseDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.*;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
 import com.diploma.skillboxjavaspring.exceptions.InvalidHotelRatingException;
 import com.diploma.skillboxjavaspring.mapper.HotelMapper;
 import com.diploma.skillboxjavaspring.repositories.HotelRepository;
+import com.diploma.skillboxjavaspring.specification.HotelSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -171,5 +174,29 @@ public class HotelService {
         Hotel updated = hotelRepository.save(hotel);
 
         return hotelMapper.toResponseDTO(updated);
+    }
+
+    /**
+     * Retrieves hotels using filtering and pagination.
+     *
+     * @param filter   filter parameters
+     * @param pageable pagination parameters
+     * @return paginated hotel response with total number of matching hotels
+     */
+    @Transactional(readOnly = true)
+    public HotelPageResponseDTO findHotels(HotelFilterDTO filter, Pageable pageable) {
+        log.debug("=> Find hotels with filter: {}, pageable: {}", filter, pageable);
+
+        Specification<Hotel> specification = HotelSpecification.filter(filter);
+        Page<Hotel> page = hotelRepository
+                .findAll(specification, pageable);
+
+        List<HotelResponseDTO> hotels = page
+                .getContent()
+                .stream()
+                .map(hotelMapper::toResponseDTO)
+                .toList();
+
+        return new HotelPageResponseDTO(page.getTotalElements(), hotels);
     }
 }

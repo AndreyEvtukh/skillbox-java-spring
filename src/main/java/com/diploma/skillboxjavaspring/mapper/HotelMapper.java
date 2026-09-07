@@ -1,7 +1,7 @@
 package com.diploma.skillboxjavaspring.mapper;
 
-import com.diploma.skillboxjavaspring.dto.HotelRequestDTO;
-import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.HotelRequestDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.HotelResponseDTO;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

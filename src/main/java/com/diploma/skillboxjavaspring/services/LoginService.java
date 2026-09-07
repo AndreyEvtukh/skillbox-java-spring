@@ -1,6 +1,10 @@
 package com.diploma.skillboxjavaspring.services;
 
 import com.diploma.skillboxjavaspring.dto.*;
+import com.diploma.skillboxjavaspring.dto.login.LoginRequest;
+import com.diploma.skillboxjavaspring.dto.login.LoginResponse;
+import com.diploma.skillboxjavaspring.dto.logout.LogoutRequest;
+import com.diploma.skillboxjavaspring.dto.logout.LogoutResponse;
 import com.diploma.skillboxjavaspring.entity.User;
 import com.diploma.skillboxjavaspring.exceptions.InvalidLoginEmailException;
 import com.diploma.skillboxjavaspring.exceptions.InvalidLoginPasswordException;
