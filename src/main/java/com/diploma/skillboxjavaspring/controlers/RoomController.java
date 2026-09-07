@@ -1,8 +1,8 @@
 package com.diploma.skillboxjavaspring.controlers;
 
-import com.diploma.skillboxjavaspring.dto.RoomRequestDTO;
-import com.diploma.skillboxjavaspring.dto.RoomResponseDTO;
-import com.diploma.skillboxjavaspring.dto.RoomUpdateDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomRequestDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomResponseDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomUpdateDTO;
 import com.diploma.skillboxjavaspring.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

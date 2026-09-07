@@ -1,4 +1,4 @@
-package com.diploma.skillboxjavaspring.dto;
+package com.diploma.skillboxjavaspring.dto.booking;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

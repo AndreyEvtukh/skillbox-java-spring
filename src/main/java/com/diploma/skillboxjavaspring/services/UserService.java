@@ -1,8 +1,8 @@
 package com.diploma.skillboxjavaspring.services;
 
-import com.diploma.skillboxjavaspring.dto.UserRequestDTO;
-import com.diploma.skillboxjavaspring.dto.UserResponseDTO;
-import com.diploma.skillboxjavaspring.dto.UserUpdateDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserRequestDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserResponseDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.Role;
 import com.diploma.skillboxjavaspring.entity.User;
 import com.diploma.skillboxjavaspring.exceptions.UserEmailExistedException;
@@ -41,12 +41,10 @@ public class UserService {
     public List<UserResponseDTO> getAll() {
         log.debug("=> Get all users");
 
-        List<UserResponseDTO> users = userRepository.findAll()
+        return userRepository.findAll()
                 .stream()
                 .map(userMapper::toResponseDTO)
                 .toList();
-
-        return users;
     }
 
     /**
@@ -159,8 +157,6 @@ public class UserService {
         user.setActive(active);
         userRepository.flush();
 
-        UserResponseDTO userResponseDTO = userMapper.toResponseDTO(user);
-
-        return userResponseDTO;
+        return userMapper.toResponseDTO(user);
     }
 }

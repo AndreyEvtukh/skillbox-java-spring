@@ -1,9 +1,9 @@
 package com.diploma.skillboxjavaspring.mapper;
 
-import com.diploma.skillboxjavaspring.dto.BookingPeriodDTO;
-import com.diploma.skillboxjavaspring.dto.RoomRequestDTO;
-import com.diploma.skillboxjavaspring.dto.RoomResponseDTO;
-import com.diploma.skillboxjavaspring.dto.RoomUpdateDTO;
+import com.diploma.skillboxjavaspring.dto.booking.BookingPeriodDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomRequestDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomResponseDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.Booking;
 import com.diploma.skillboxjavaspring.entity.Room;
 import org.mapstruct.Mapper;

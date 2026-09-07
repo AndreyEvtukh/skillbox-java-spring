@@ -1,6 +1,8 @@
 package com.diploma.skillboxjavaspring.mapper;
 
-import com.diploma.skillboxjavaspring.dto.*;
+import com.diploma.skillboxjavaspring.dto.user.UserRequestDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserResponseDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

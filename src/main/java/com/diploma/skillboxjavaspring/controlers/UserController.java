@@ -1,6 +1,8 @@
 package com.diploma.skillboxjavaspring.controlers;
 
-import com.diploma.skillboxjavaspring.dto.*;
+import com.diploma.skillboxjavaspring.dto.user.UserRequestDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserResponseDTO;
+import com.diploma.skillboxjavaspring.dto.user.UserUpdateDTO;
 import com.diploma.skillboxjavaspring.exceptions.UserEmailExistedException;
 import com.diploma.skillboxjavaspring.exceptions.UserIDNotFoundException;
 import com.diploma.skillboxjavaspring.exceptions.UserNameExistedException;

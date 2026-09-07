@@ -1,8 +1,8 @@
 package com.diploma.skillboxjavaspring.services;
 
-import com.diploma.skillboxjavaspring.dto.RoomRequestDTO;
-import com.diploma.skillboxjavaspring.dto.RoomResponseDTO;
-import com.diploma.skillboxjavaspring.dto.RoomUpdateDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomRequestDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomResponseDTO;
+import com.diploma.skillboxjavaspring.dto.room.RoomUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import com.diploma.skillboxjavaspring.entity.Room;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;

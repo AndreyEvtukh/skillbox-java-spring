@@ -1,4 +1,4 @@
-package com.diploma.skillboxjavaspring.dto;
+package com.diploma.skillboxjavaspring.dto.login;
 
 import com.diploma.skillboxjavaspring.entity.Role;
 

@@ -1,5 +1,6 @@
-package com.diploma.skillboxjavaspring.dto;
+package com.diploma.skillboxjavaspring.dto.room;
 
+import com.diploma.skillboxjavaspring.dto.booking.BookingPeriodDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

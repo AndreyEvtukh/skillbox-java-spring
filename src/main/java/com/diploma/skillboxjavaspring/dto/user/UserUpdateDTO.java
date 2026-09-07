@@ -1,20 +1,14 @@
-package com.diploma.skillboxjavaspring.dto;
+package com.diploma.skillboxjavaspring.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Carries the validated data used to update an existing user.
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Schema(description = "Data for updating a user")
-public class UserUpdateDTO {
+public record UserUpdateDTO() {
 
     /**
      * The user's updated display name.
@@ -25,19 +19,19 @@ public class UserUpdateDTO {
             message = "Username must not start or end with a space"
     )
     @Schema(description = "User name", example = "Bill Duke")
-    private String username;
+    private static String username;
 
     /**
      * The user's updated email address.
      */
     @NotBlank(message = "Email can not be blank")
     @Schema(description = "User email", example = "example@mail.com")
-    private String email;
+    private static String email;
 
     /**
      * The user's updated password.
      */
     @NotBlank(message = "Password can not be blank")
     @Schema(description = "User password", example = "1245")
-    private String password;
+    private static String password;
 }

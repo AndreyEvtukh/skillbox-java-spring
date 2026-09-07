@@ -1,8 +1,8 @@
 package com.diploma.skillboxjavaspring.controlers;
 
-import com.diploma.skillboxjavaspring.dto.BookingRequestDTO;
-import com.diploma.skillboxjavaspring.dto.BookingResponseDTO;
-import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
+import com.diploma.skillboxjavaspring.dto.booking.BookingRequestDTO;
+import com.diploma.skillboxjavaspring.dto.booking.BookingResponseDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.HotelResponseDTO;
 import com.diploma.skillboxjavaspring.services.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
