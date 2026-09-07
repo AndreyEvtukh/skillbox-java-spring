@@ -1,9 +1,11 @@
 package com.diploma.skillboxjavaspring.services;
 
+import com.diploma.skillboxjavaspring.dto.HotelRatingRequestDTO;
 import com.diploma.skillboxjavaspring.dto.HotelRequestDTO;
 import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
+import com.diploma.skillboxjavaspring.exceptions.InvalidHotelRatingException;
 import com.diploma.skillboxjavaspring.mapper.HotelMapper;
 import com.diploma.skillboxjavaspring.repositories.HotelRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +25,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class HotelService {
+
+    /**
+     * Repository used to persist and retrieve hotels.
+     */
     private final HotelRepository hotelRepository;
 
+    /**
+     * Mapper used to convert between hotel entities and response DTOs.
+     */
     private final HotelMapper hotelMapper;
 
     /**
@@ -70,8 +80,8 @@ public class HotelService {
         log.debug("=> Add new hotel {}", hotelRequestDTO);
 
         Hotel hotel = hotelMapper.toEntity(hotelRequestDTO);
-        hotel.setRating(BigDecimal.ONE);
-        hotel.setRatingCount(0);
+        hotel.setRating(BigDecimal.ZERO);
+        hotel.setNumOfRating(0);
         Hotel saved = hotelRepository.save(hotel);
 
         return hotelMapper.toResponseDTO(saved);
@@ -81,7 +91,7 @@ public class HotelService {
     /**
      * Updates an existing hotel with the values supplied in the request DTO.
      *
-     * @param ID the unique identifier of the hotel to update
+     * @param ID              the unique identifier of the hotel to update
      * @param hotelRequestDTO the data containing the hotel's updated values
      * @return a response DTO representing the updated hotel
      * @throws HotelNotFoundException if no hotel exists with the supplied identifier
@@ -113,5 +123,53 @@ public class HotelService {
                 .orElseThrow(() -> new HotelNotFoundException(ID));
 
         hotelRepository.delete(hotel);
+    }
+
+    /**
+     * Updates a hotel's rating and rating count.
+     *
+     * @param id                    the unique identifier of the hotel to update
+     * @param hotelRatingRequestDTO the data containing the new hotel rating
+     * @return a response DTO representing the updated hotel
+     * @throws HotelNotFoundException      if no hotel exists with the supplied identifier
+     * @throws InvalidHotelRatingException if the rating is outside the supported range
+     */
+    public HotelResponseDTO updateRating(UUID id, HotelRatingRequestDTO hotelRatingRequestDTO) {
+        log.debug("=> Update hotel rating by ID. New: {}", hotelRatingRequestDTO.getNewRating());
+
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new HotelNotFoundException(id));
+
+        BigDecimal newRating = BigDecimal.valueOf(hotelRatingRequestDTO.getNewRating());
+        if (newRating.compareTo(BigDecimal.ONE) < 0 ||
+                newRating.compareTo(BigDecimal.valueOf(5)) > 0) {
+            throw new InvalidHotelRatingException();
+        }
+
+        BigDecimal rating = hotel.getRating();
+        Integer numberOfRating = hotel.getNumOfRating();
+        BigDecimal totalRating;
+
+        if (numberOfRating == 0) {
+            rating = newRating;
+        } else {
+            totalRating = rating.multiply(BigDecimal.valueOf(numberOfRating));
+            totalRating = totalRating
+                    .subtract(rating)
+                    .add(newRating);
+            rating = totalRating
+                    .divide(
+                            BigDecimal.valueOf(numberOfRating),
+                            1,
+                            RoundingMode.HALF_UP
+                    );
+        }
+        numberOfRating = numberOfRating + 1;
+
+        hotel.setRating(rating);
+        hotel.setNumOfRating(numberOfRating);
+        Hotel updated = hotelRepository.save(hotel);
+
+        return hotelMapper.toResponseDTO(updated);
     }
 }

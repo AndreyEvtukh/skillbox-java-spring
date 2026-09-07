@@ -161,10 +161,12 @@ export default class UsersPageController extends ApplicationPageClass {
     if (!this.isAdmin()) {
       return this.dialogsService.showNoPermissionsDialog();
     }
+
     const config = {
-      message: "Are you sure you want to logout?",
+      message: "Are you sure you want to delete this user?",
       onConfirm: () => this.authService.deleteUser(user.id!)
     }
+
     return this.dialogsService.showConfirmationDialog(config)
       .afterClosed()
       .subscribe(result => {

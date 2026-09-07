@@ -1,7 +1,10 @@
 package com.diploma.skillboxjavaspring.controlers;
 
+import com.diploma.skillboxjavaspring.dto.HotelRatingRequestDTO;
 import com.diploma.skillboxjavaspring.dto.HotelRequestDTO;
 import com.diploma.skillboxjavaspring.dto.HotelResponseDTO;
+import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
+import com.diploma.skillboxjavaspring.exceptions.InvalidHotelRatingException;
 import com.diploma.skillboxjavaspring.services.HotelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +34,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class HotelController {
 
+    /**
+     * Service that implements hotel-management operations.
+     */
     private final HotelService hotelService;
 
     /**
@@ -180,5 +186,33 @@ public class HotelController {
     ) {
         hotelService.deleteById(ID);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Updates a hotel's rating.
+     *
+     * @param ID                    the unique identifier of the hotel to update
+     * @param hotelRatingRequestDTO the data containing the new hotel rating
+     * @return an {@code OK} response containing the updated hotel
+     * @throws HotelNotFoundException if no hotel exists with the specified identifier
+     * @throws InvalidHotelRatingException if the rating is outside the supported range
+     */
+    @Operation(
+            summary = "Update hotel rating",
+            description = "Updates an existing hotel rating and returns the updated hotel."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Hotel rating updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Incorrect input data"),
+            @ApiResponse(responseCode = "404", description = "Hotel not found")
+    })
+    @PutMapping("/{id}/rating")
+    ResponseEntity<HotelResponseDTO> updateRating(
+            @Parameter(description = "Unique hotel identifier", required = true)
+            @PathVariable("id") UUID ID,
+            @Valid @RequestBody HotelRatingRequestDTO hotelRatingRequestDTO
+    ) {
+        HotelResponseDTO updated = hotelService.updateRating(ID, hotelRatingRequestDTO);
+        return ResponseEntity.ok(updated);
     }
 }
