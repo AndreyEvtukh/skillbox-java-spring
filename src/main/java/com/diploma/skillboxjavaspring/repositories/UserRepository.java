@@ -36,4 +36,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * @return {@code true} if the email address is already in use
      */
     boolean existsByEmail(String email);
+
+    Optional<User> findByEmail(String email);
 }

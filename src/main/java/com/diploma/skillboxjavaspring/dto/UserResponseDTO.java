@@ -38,4 +38,15 @@ public class UserResponseDTO {
     @Schema(description = "User role", example = "ADMIN")
     private String role;
 
+    /**
+     * The user's status.
+     */
+    @Schema(description = "User status", example = "false")
+    private Boolean active;
+
+    /**
+     * The event type.
+     */
+    @Schema(description = "Event type", example = "edit")
+    private String event;
 }

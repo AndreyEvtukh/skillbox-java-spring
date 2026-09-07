@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -114,6 +115,7 @@ public class HotelController {
                     )
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<HotelResponseDTO> create(
             @Valid @RequestBody HotelRequestDTO hotelRequestDTO
@@ -146,6 +148,7 @@ public class HotelController {
             @ApiResponse(responseCode = "400", description = "Incorrect input data"),
             @ApiResponse(responseCode = "404", description = "Hotel not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<HotelResponseDTO> update(
             @Parameter(description = "Unique hotel identifier", required = true)
@@ -170,6 +173,7 @@ public class HotelController {
             @ApiResponse(responseCode = "204", description = "Hotel deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Hotel not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable("id") UUID ID

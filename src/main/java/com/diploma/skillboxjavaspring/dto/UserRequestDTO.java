@@ -1,9 +1,7 @@
 package com.diploma.skillboxjavaspring.dto;
 
-import com.diploma.skillboxjavaspring.entity.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
@@ -36,17 +34,10 @@ public class UserRequestDTO {
     private String email;
 
     /**
-     * The role assigned to the user.
-     */
-    @NotNull(message = "User role can not be null")
-    @Schema(description = "User role", example = "USER")
-    private Role role;
-
-    /**
      * The encoded password for the user.
      */
     @NotBlank(message = "Password can not be blank")
     @Schema(description = "User password hash", example = "alksjfdaskfldjskdjfhskdj256")
-    private String passwordHash;
+    private String password;
 
 }

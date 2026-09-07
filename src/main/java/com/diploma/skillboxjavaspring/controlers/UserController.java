@@ -1,6 +1,10 @@
 package com.diploma.skillboxjavaspring.controlers;
 
 import com.diploma.skillboxjavaspring.dto.*;
+import com.diploma.skillboxjavaspring.exceptions.UserEmailExistedException;
+import com.diploma.skillboxjavaspring.exceptions.UserIDNotFoundException;
+import com.diploma.skillboxjavaspring.exceptions.UserNameExistedException;
+import com.diploma.skillboxjavaspring.exceptions.UserNameNotFoundException;
 import com.diploma.skillboxjavaspring.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,10 +17,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -33,16 +39,37 @@ public class UserController {
      */
     private final UserService userService;
 
+    //---------------------//
+    // ===== GET ALL ===== //
+    //---------------------//
 
-    //----------------------//
+    /**
+     * Returns all users.
+     *
+     * @return an HTTP 200 response containing the list of users
+     */
+    @Operation(
+            summary = "Get all user",
+            description = "Returns the list of all users."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Users successfully retrieved")
+    })
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        return ResponseEntity.ok(userService.getAll());
+    }
+
+    //---------------------//
     // === GET BY NAME === //
-    //----------------------//
+    //---------------------//
 
     /**
      * Returns a user identified by username.
      *
      * @param username the username to search for
      * @return an HTTP 200 response containing the user data
+     * @throws UserNameNotFoundException if no user has the specified username
      */
     @Operation(
             summary = "Find user",
@@ -72,6 +99,8 @@ public class UserController {
      *
      * @param userRequestDTO the validated data for the user to create
      * @return an HTTP 201 response containing the created user and its location
+     * @throws UserNameExistedException  if the username is already in use
+     * @throws UserEmailExistedException if the email address is already in use
      */
     @Operation(
             summary = "Add new user",
@@ -108,10 +137,12 @@ public class UserController {
                     )
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<UserResponseDTO> create(
             @Valid @RequestBody UserRequestDTO userRequestDTO
     ) {
+        log.debug("=> Received request to create new user {}", userRequestDTO);
         UserResponseDTO saved = userService.create(userRequestDTO);
 
         URI location = ServletUriComponentsBuilder
@@ -130,9 +161,12 @@ public class UserController {
     /**
      * Updates a user identified by its unique ID.
      *
-     * @param id the unique ID of the user to update
+     * @param id            the unique ID of the user to update
      * @param userUpdateDTO the validated updated user data
      * @return an HTTP 200 response containing the updated user
+     * @throws UserIDNotFoundException   if no user has the specified ID
+     * @throws UserNameExistedException  if the username is already in use
+     * @throws UserEmailExistedException if the email address is already in use
      */
     @Operation(
             summary = "Update user",
@@ -143,6 +177,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Incorrect input data"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(
             consumes = "application/json",
             produces = "application/json",
@@ -165,6 +200,7 @@ public class UserController {
      *
      * @param ID the unique ID of the user to delete
      * @return an HTTP 204 response when the user is deleted
+     * @throws UserIDNotFoundException if no user has the specified ID
      */
     @Operation(
             summary = "Delete user",
@@ -174,6 +210,7 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable("id") UUID ID

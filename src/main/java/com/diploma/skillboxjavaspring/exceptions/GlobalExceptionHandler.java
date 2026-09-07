@@ -1,9 +1,11 @@
 package com.diploma.skillboxjavaspring.exceptions;
 
 import com.diploma.skillboxjavaspring.dto.ErrorResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * Converts application exceptions into consistent HTTP error responses.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -79,13 +82,38 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleUnexpectedException(
             Exception exception
     ) {
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+        log.error("Unhandled exception", exception);
+
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Internal server error"
+        );
+    }
+
+    @ExceptionHandler(InvalidLoginEmailException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(
+            InvalidLoginEmailException exception
+    ) {
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidLoginPasswordException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidCredentials(
+            InvalidLoginPasswordException exception
+    ) {
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                exception.getMessage()
+        );
     }
 
     /**
      * Builds a standardized error response.
      *
-     * @param status the HTTP status to return
+     * @param status  the HTTP status to return
      * @param message the error message to include
      * @return the response containing an {@link ErrorResponseDTO}
      */
@@ -114,6 +142,17 @@ public class GlobalExceptionHandler {
     ) {
         return buildErrorResponse(
                 HttpStatus.CONFLICT,
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAuthorizationDeniedException(
+            AuthorizationDeniedException exception) {
+
+        log.error("=> Authorization Denied", exception);
+        return buildErrorResponse(
+                HttpStatus.FORBIDDEN,
                 exception.getMessage()
         );
     }
