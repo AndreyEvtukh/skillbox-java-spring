@@ -1,0 +1,103 @@
+<header class="flex flex-row p-8 justify-between">
+  <p class="text-dark-9 text-18 flex flex-row items-center justify-center">
+    <span class="font-medium">Evtukh</span>&#160;Andrey
+  </p>
+
+  <nav
+    class="absolute w-full flex flex-row items-center justify-center left-0 gap-4 h-8 text-12 font-medium color-dark-8">
+    <a
+      class="!h-4 !w-4"
+      [routerLink]="['/']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <mat-icon [svgIcon]="ICONS.Home"
+                class="!h-4 !w-4 cursor-pointer transition-all duration-200 color-dark-8 hover:!text-[var(--color-dark-9)]"
+                [ngClass]="{
+                      'color-green': isPageActive('main'),
+                      'color-dark-8': !isPageActive('main')
+                }"
+      />
+    </a>
+    <span class="leading-4 text-14">|</span>
+    <a
+      [routerLink]="['/hotels']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="cursor-pointer hover:!text-[var(--color-dark-9)] transition-all duration-200"
+      [ngClass]="{'color-green': isPageActive('hotels'), 'color-dark-8': !isPageActive('hotels') }">
+      Hotels
+    </a>
+    <span class="leading-4 text-14">|</span>
+    <a
+      [routerLink]="['/rooms']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="cursor-pointer hover:!text-[var(--color-dark-9)] transition-all duration-200"
+      [ngClass]="{'color-green': isPageActive('rooms'), 'color-dark-8': !isPageActive('rooms') }">
+      Rooms
+    </a>
+    <span class="leading-4 text-14">|</span>
+    <a
+      [routerLink]="['/users']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="cursor-pointer hover:!text-[var(--color-dark-9)] transition-all duration-200"
+      [ngClass]="{'color-green': isPageActive('users'), 'color-dark-8': !isPageActive('users') }">
+      Users
+    </a>
+    <span class="leading-4 text-14">|</span>
+    <a
+      [routerLink]="['/booking']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="cursor-pointer hover:!text-[var(--color-dark-9)] transition-all duration-200"
+      [ngClass]="{'color-green': isPageActive('booking'), 'color-dark-8': !isPageActive('booking') }">
+      Booking
+    </a>
+  </nav>
+
+
+  <div class="relative flex items-center justify-center">
+    @if (loading()) {
+      <div class="h-8 w-16 flex flex-row items-center justify-center">
+        <mat-spinner @fadeAnimation class="absolute color-green" [diameter]="16"></mat-spinner>
+      </div>
+    } @else if (!user()?.email) {
+      <div class="h-8 w-16">
+        <button
+          @fadeAnimation
+          class="absolute border border-l-green  border-y-transparent rounded text-12! font-medium! text-green cursor-pointer hover:bg-dark-2 w-full h-full"
+          (click)="goLogin()"
+        > Login
+        </button>
+      </div>
+    } @else {
+      <button [matMenuTriggerFor]="userMenu"
+              class="text-green text-14 cursor-pointer h-8 flex flex-row gap-4 items-center">
+        <mat-icon [svgIcon]="ICONS.USER" class="!h-6 !w-6 !border-green"/>
+        <span class="flex flex-row gap-2 items-center">
+          <span>{{ user()?.email }}</span>
+          <mat-icon [svgIcon]="ICONS.DROPDOWN_ARROW" class="!h-2 !w-2 !border-green -mb-0.5"/>
+        </span>
+      </button>
+    }
+  </div>
+</header>
+
+<mat-menu #userMenu="matMenu" xPosition="before">
+  <div class="flex flex-col items-end rounded-md bg-dark-4 overflow-hidden min-w-48">
+    <div mat-menu-item
+         class="p-4 w-full text-left cursor-default">
+      <p class="text-14 text-end font-light text-dark-9">{{ user()?.username }}</p>
+      <p class="text-12 text-end font-light text-dark-9">{{ user()?.email }}</p>
+      <p class="text-10 text-end font-mono mt-4 text-dark-9">[ Role ]: {{ user()?.role }}</p>
+    </div>
+    <hr class="w-full text-dark-6"/>
+    <button mat-menu-item
+            class="p-4 w-full text-end  cursor-pointer hover:bg-dark-3 transition duration-200"
+            (click)="goLogout()">
+      <span class="text-12 text-green">Logout</span>
+    </button>
+  </div>
+</mat-menu>
