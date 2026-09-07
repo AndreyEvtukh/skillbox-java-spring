@@ -1,0 +1,5 @@
+@if(!user()?.email) {
+  <div class="flex flex-col items-center justify-center h-1/2">
+    <app-for-registered-only-page></app-for-registered-only-page>
+  </div>
+}
