@@ -1,4 +1,4 @@
-package com.diploma.skillboxjavaspring.controlers;
+package com.diploma.skillboxjavaspring.controllers;
 
 import com.diploma.skillboxjavaspring.dto.*;
 import com.diploma.skillboxjavaspring.dto.login.LoginRequest;
