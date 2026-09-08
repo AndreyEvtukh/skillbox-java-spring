@@ -30,7 +30,7 @@ public class BookingRequestDTO {
     @NotNull(message = "User ID can not be null")
     @Schema(
             description = "Unique user identifier",
-            example = "024b8315-2389-4642-af8b-670428790452"
+            example = "c083ce11-b83f-44cf-9a15-ab1df7f39814"
     )
     private UUID userId;
 

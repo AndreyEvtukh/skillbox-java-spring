@@ -28,9 +28,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // DB
-    // implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
+
+    implementation("org.springframework.boot:spring-boot-starter-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+    implementation("com.github.librepdf:openpdf:2.0.3")
 
     implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -49,7 +53,6 @@ dependencies {
 
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-//    testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-test")
     testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")

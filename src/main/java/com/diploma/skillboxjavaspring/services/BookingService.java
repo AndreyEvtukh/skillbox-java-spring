@@ -10,6 +10,8 @@ import com.diploma.skillboxjavaspring.mapper.BookingMapper;
 import com.diploma.skillboxjavaspring.repositories.BookingRepository;
 import com.diploma.skillboxjavaspring.repositories.RoomRepository;
 import com.diploma.skillboxjavaspring.repositories.UserRepository;
+import com.diploma.skillboxjavaspring.statistics.dto.RoomBookedEvent;
+import com.diploma.skillboxjavaspring.statistics.service.StatisticsEventPublisher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class BookingService {
     private final UserRepository userRepository;
 
     private final BookingMapper bookingMapper;
+    private final StatisticsEventPublisher statisticsEventPublisher;
 
     /**
      * Retrieves all bookings.
@@ -100,6 +103,14 @@ public class BookingService {
         booking.setUser(user);
 
         Booking saved = bookingRepository.save(booking);
+
+        statisticsEventPublisher.publishRoomBooked(
+                RoomBookedEvent.create(
+                        booking.getUser().getId(),
+                        booking.getCheckIn(),
+                        booking.getCheckOut()
+                )
+        );
 
         log.debug("<= New booking {}", saved);
 
