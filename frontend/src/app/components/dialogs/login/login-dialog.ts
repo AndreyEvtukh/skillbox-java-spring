@@ -29,11 +29,6 @@ export default class LoginDialogComponent extends ApplicationDialogClass impleme
 
   protected readonly loading: WritableSignal<boolean> = this.authService.waitLoginSpinner;
 
-  get emailIsInvalid() {
-    const { errors } = this.form.controls["email"];
-    return errors?.["email"] || errors?.["pattern"];
-  }
-
   constructor() {
     super();
 

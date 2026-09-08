@@ -2,7 +2,6 @@ package com.diploma.skillboxjavaspring.controllers;
 
 import com.diploma.skillboxjavaspring.dto.user.UserRequestDTO;
 import com.diploma.skillboxjavaspring.dto.user.UserResponseDTO;
-import com.diploma.skillboxjavaspring.dto.user.UserUpdateDTO;
 import com.diploma.skillboxjavaspring.exceptions.UserEmailExistedException;
 import com.diploma.skillboxjavaspring.exceptions.UserIDNotFoundException;
 import com.diploma.skillboxjavaspring.exceptions.UserNameExistedException;
@@ -164,7 +163,7 @@ public class UserController {
      * Updates a user identified by its unique ID.
      *
      * @param id            the unique ID of the user to update
-     * @param userUpdateDTO the validated updated user data
+     * @param response the validated updated user data
      * @return an HTTP 200 response containing the updated user
      * @throws UserIDNotFoundException   if no user has the specified ID
      * @throws UserNameExistedException  if the username is already in use
@@ -187,9 +186,9 @@ public class UserController {
     )
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable UUID id,
-            @Valid @RequestBody UserUpdateDTO userUpdateDTO
+            @Valid @RequestBody UserRequestDTO response
     ) {
-        UserResponseDTO updated = userService.update(id, userUpdateDTO);
+        UserResponseDTO updated = userService.update(id, response);
         return ResponseEntity.ok(updated);
     }
 

@@ -1,20 +1,20 @@
-import { computed, Directive, inject, OnDestroy, signal, Signal, WritableSignal } from '@angular/core';
+import { computed, Directive, effect, inject, OnDestroy, signal, Signal, WritableSignal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ConfirmationDialogConfig, ICONS } from '../../app.constants';
-import { AuthService } from '../../services/auth-service';
+import { AuthService } from '../../services/auth.service';
 import { FormGroup } from '@angular/forms';
+import { isObservable } from 'rxjs';
 
 @Directive()
 export abstract class ApplicationDialogClass implements OnDestroy {
+  protected readonly data: any  = inject(MAT_DIALOG_DATA);
+  protected readonly dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<any>, { optional: true });
+  protected readonly dialog = inject(MatDialog);
+  protected readonly authService = inject(AuthService);
+
   protected abstract component: any;
   protected showPassword = false;
   protected showConfirmPassword = false;
-
-  protected readonly data: any  = inject(MAT_DIALOG_DATA);
-  protected readonly dialog = inject(MatDialog);
-  protected readonly dialogRef: MatDialogRef<any> | null = null;
-
-  protected readonly authService = inject(AuthService);
 
   protected readonly user: WritableSignal<any> = this.authService.user;
   protected readonly error: WritableSignal<any> = this.authService.error;
@@ -36,26 +36,61 @@ export abstract class ApplicationDialogClass implements OnDestroy {
   protected config: Signal<ConfirmationDialogConfig> = computed(() => {
     const config: ConfirmationDialogConfig = {...this.data}
     if (!config.title) config.title = 'Confirmation';
-    if (!config.confirm) config.confirm = 'Confirm';
-    if (!config.cancel) config.cancel = 'Cancel';
+    if (!config.confirmButtonText) config.confirmButtonText = 'Confirm';
+    if (!config.cancelButtonText) config.cancelButtonText = 'Cancel';
     if (typeof this.data.onSuccess === 'function') config.onConfirm = this.data.onSuccess;
     if (typeof this.data.onConfirm === 'function') config.onConfirm = this.data.onConfirm;
     if (typeof this.data.onCancel === 'function') config.onCancel = this.data.onCancel ?? (() => null);
     return config;
   });
 
-  protected close(): void {
+  get emailIsInvalid() {
+    const { errors } = this.form.controls["email"];
+    return errors?.["email"] || errors?.["pattern"];
+  }
+
+  constructor() {
+    effect(() => {
+      const user = this.authService.user();
+      this.user.set(user);
+
+      if (this.error()) {
+        this.setInfo({ ok: false, message: this.error() });
+      }
+    });
+  }
+
+  protected close(result?: {ok : boolean}): void {
     if (this.dialogRef) {
       this.error.set(null)
-      this.dialogRef.close();
+      this.dialogRef.close(result);
     }
   }
 
-  protected async confirm(): Promise<void> {
-    if (typeof this.config().onConfirm === 'function') {
-      this.config().onConfirm?.();
+  protected confirm(): void {
+    const onConfirm = this.config().onConfirm;
+
+    if (typeof onConfirm !== 'function') {
+      this.dialogRef!.close({ ok: true });
+      return;
     }
-    this.close();
+
+    const result = onConfirm();
+
+    if (isObservable(result)) {
+      result.subscribe({
+        next: () => {
+          this.dialogRef?.close({ ok: true });
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+
+      return;
+    }
+
+    this.dialogRef?.close({ ok: true });
   }
 
   protected setInfo(data: any) {
@@ -67,6 +102,6 @@ export abstract class ApplicationDialogClass implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.dialogRef?.close('destroyed');
+    // this.dialogRef?.close('destroyed');
   }
 }

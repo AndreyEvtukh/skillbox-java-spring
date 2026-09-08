@@ -1,12 +1,15 @@
 import { Component,  } from '@angular/core';
+import ForRegisteredOnlyController from "../../components/for-registered-only/forRegisteredOnly";
+import { ApplicationPageClass } from '../app.pages.class';
 
 @Component({
-  imports: [],
+    imports: [
+        ForRegisteredOnlyController
+    ],
   selector: 'app-booking-page',
-  styleUrl: './booking.page.css',
   templateUrl: './booking.page.html',
 })
-export default class BookingPageController {
+export default class BookingPageController extends ApplicationPageClass {
 
 }
 

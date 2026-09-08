@@ -15,7 +15,7 @@ import { AUTH, ICONS } from '../../../app.constants';
 import { MatchPasswordDirective } from '../../../directives/match-password.directive';
 import LoginDialogComponent from '../login/login-dialog';
 import { NoWhitespaceDirective } from '../../../directives/no-whitespace.directive';
-import { AuthService } from '../../../services/auth-service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-register',

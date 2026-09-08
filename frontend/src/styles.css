@@ -33,6 +33,16 @@
   --font-monospace: monospace, ui-monospace, SFMono-Regular;
 }
 
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 @font-face {
   font-family: "Light";
   src: url("./assets/fonts/light.ttf") format("woff");

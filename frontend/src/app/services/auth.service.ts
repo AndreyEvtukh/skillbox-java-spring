@@ -1,11 +1,7 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, catchError, Subscription } from 'rxjs';
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+import { Observable, map, of, catchError } from 'rxjs';
+import { User } from './users.service';
 
 export interface LoginResponse {
   username: string;
@@ -19,22 +15,6 @@ export interface LogoutResponse {
   email: string;
   active: boolean;
 }
-
-export interface LoginError {
-  ok: boolean;
-  message: string;
-}
-
-export type User = {
-  id?: string;
-  username?: string;
-  email?: string;
-  role?: string;
-  active?: boolean;
-  ok?: boolean;
-  message?: string;
-  event?: "edit" | 'add' | 'delete';
-};
 
 export type CheckActiveResponse = {
   email?: string;
@@ -99,7 +79,7 @@ export class AuthService {
     )
       .subscribe({
         next: (res) => {
-          console.log("[User]: ", res)
+          console.log("[LOGIN User]: ", res)
           this.user.set(res);
           this.waitLoginSpinner.set(false);
           sessionStorage.setItem('auth_credentials', credentials);
@@ -216,7 +196,7 @@ export class AuthService {
           );
           this.waitLoginSpinner.set(false);
 
-          console.log("[User]: ", updatedUser)
+          console.log("[LOAD User]: ", updatedUser)
           return updatedUser;
         }),
 
@@ -229,89 +209,5 @@ export class AuthService {
           return of(null);
         })
       );
-  }
-
-  public addUser(username: string, email: string, password: string) {
-    this.waitUserAddSpinner.set(true);
-    this.error.set(null);
-
-    this.http.post(this.url + 'user', { username, email, password })
-      .subscribe({
-        next: (res) => {
-          console.log("[User]: ", res)
-          this.waitUserAddSpinner.set(false);
-        },
-
-        error: (error) => {
-          if (error.error.status === 400) {
-            this.waitUserAddSpinner.set(false);
-            const message = error.error?.message || 'Invalid email or password';
-            this.error.set(message);
-            return;
-          }
-
-          const message =
-            error.error?.message ||
-            'Invalid email or password';
-
-          this.error.set(message);
-        }
-      });
-  }
-
-  public editUser(id: string, username: string, email: string, password: string, callback?: Function): Subscription {
-    this.waitUserAddSpinner.set(true);
-    this.error.set(null);
-
-    return this.http.put(this.url + 'user/' + id, { username, email, password })
-      .subscribe({
-        next: (res) => {
-          console.log("[User]: ", res)
-          this.waitUserAddSpinner.set(false);
-          if (callback) return callback();
-        },
-
-        error: (error) => {
-          if (error.error.status === 400) {
-            this.waitUserAddSpinner.set(false);
-            const message = error.error?.message || 'Invalid email or password';
-            this.error.set(message);
-            return;
-          }
-
-          const message =
-            error.error?.message ||
-            'Invalid email or password';
-
-          this.error.set(message);
-        }
-      });
-  }
-
-  public deleteUser(id: string): Subscription {
-    this.waitUserAddSpinner.set(true);
-    this.error.set(null);
-
-    return this.http.delete(this.url + 'user/' + id)
-      .subscribe({
-        next: () => {
-          this.waitUserAddSpinner.set(false);
-        },
-
-        error: (error) => {
-          if (error.error.status === 400) {
-            this.waitUserAddSpinner.set(false);
-            const message = error.error?.message || 'Invalid email or password';
-            this.error.set(message);
-            return;
-          }
-
-          const message =
-            error.error?.message ||
-            'Invalid email or password';
-
-          this.error.set(message);
-        }
-      });
   }
 }

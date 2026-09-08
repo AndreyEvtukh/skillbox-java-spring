@@ -1,81 +1,197 @@
 # Hotel Booking Service
 
-A backend service for hotel booking with content management through an administrative CMS.
+A full-stack hotel booking application with hotel and room management, user authentication, administrative content management, booking functionality, and an event-driven statistics collection system.
 
-The application provides hotel search, room booking, user management, content administration, and statistical data collection using an event-driven architecture.
+The project consists of a **Spring Boot backend** and an **Angular frontend**. PostgreSQL is used as the primary relational database, while MongoDB is used to store statistical events received asynchronously through Apache Kafka.
+
+---
+
+## Table of Contents
+
+* [Overview](#overview)
+* [Main Features](#main-features)
+* [Technology Stack](#technology-stack)
+* [Requirements](#requirements)
+* [Quick Start](#quick-start)
+* [Application Architecture](#application-architecture)
+* [Security](#security)
+* [API Documentation](#api-documentation)
+* [Databases](#databases)
+* [Statistics](#statistics)
+* [Statistics Export](#statistics-export)
+* [Database Migrations](#database-migrations)
+* [Frontend](#frontend)
+* [Docker](#docker)
+* [Local Development Without Docker](#local-development-without-docker)
+* [Project Structure](#project-structure)
+* [Version Control](#version-control)
+* [Project Tasks](#project-tasks)
+* [License](#license)
+
+---
+
+## Overview
+
+The Hotel Booking Service is a web application designed to manage hotels, rooms, users, and room bookings.
+
+The backend provides a REST API for working with the main business entities and implements authentication and role-based authorization.
+
+The frontend provides a separate Angular 22 client for interacting with the backend API.
+
+The application also contains a dedicated statistics layer based on **Apache Kafka** and **MongoDB**. User registration and room booking events are published to Kafka and processed asynchronously by a statistics consumer.
+
+Statistical data can be exported by administrators in both **CSV** and **PDF** formats.
+
+---
 
 ## Main Features
 
+### Hotel and Room Management
+
 * search hotels by specified criteria;
 * filter hotels by rating;
-* view detailed hotel and room information;
-* book rooms for a specified period;
-* prevent booking conflicts for the same room;
-* user registration and authentication;
-* role-based access control for users and administrators;
-* content management through the administrative part of the application;
-* collection of statistical events;
-* asynchronous statistics processing using Apache Kafka;
-* storage of statistical events in MongoDB;
-* export statistics to CSV;
-* export statistics to PDF.
+* view detailed hotel information;
+* view available rooms;
+* view detailed room information;
+* filter rooms using specified criteria;
+* paginate hotel and room search results.
 
-## Technology Stack
+### Booking
 
-### Backend
-* Java 21
-* Spring Boot 4.1.1
-* Gradle Kotlin DSL
-* Spring Web MVC
-* Spring Data JPA
-* Spring Data MongoDB
-* PostgreSQL 18
-* MongoDB 8
-* Flyway
-* MapStruct
-* Spring Security
-* SpringDoc OpenAPI
+* book a room for a specified period;
+* validate booking dates;
+* validate the existence of the requested room;
+* validate the existence of the requesting user;
+* prevent overlapping bookings for the same room;
+* store booking information in PostgreSQL.
+
+### User Management
+
+* user registration;
+* user authentication;
+* user identification by email;
+* role-based access control;
+* administrative user management.
+
+### Security
+
+* HTTP Basic Authentication;
+* `USER` role;
+* `ADMIN` role;
+* protected REST endpoints;
+* administrator-only endpoints;
+* role-based authorization using Spring Security.
+
+### Statistics
+
+* user registration event collection;
+* room booking event collection;
+* asynchronous event processing through Apache Kafka;
+* separate Kafka topics for different event types;
+* MongoDB storage for statistical events;
+* CSV statistics export;
+* PDF statistics export.
+
+### API
+
+* REST API;
+* OpenAPI specification;
+* Swagger UI;
+* API testing directly from Swagger UI;
+* Basic Authentication configuration through Swagger's `Authorize` button.
+
+---
+
+# Technology Stack
+
+## Backend
+
+| Technology          |    Version |
+| ------------------- | ---------: |
+| Java                |         21 |
+| Spring Boot         |      4.1.1 |
+| Gradle              | Kotlin DSL |
+| Spring Web MVC      |          — |
+| Spring Data JPA     |          — |
+| Spring Data MongoDB |          — |
+| Spring Security     |          — |
+| SpringDoc OpenAPI   |          — |
+| MapStruct           |          — |
+| Flyway              |          — |
+| PostgreSQL          |         18 |
+| MongoDB             |          8 |
+| Apache Kafka        |      7.5.3 |
+| Apache ZooKeeper    |      7.5.3 |
+| OpenPDF             |      2.0.3 |
+
+## Frontend
+
+| Technology       | Version |
+| ---------------- | ------: |
+| Angular          |  22.1.5 |
+| Angular CLI      |  22.1.7 |
+| TypeScript       |   6.0.3 |
+| Angular Material |  22.1.5 |
+| AG Grid Angular  |  36.1.0 |
+| RxJS             |   7.8.2 |
+| Tailwind CSS     |   4.3.3 |
+| normalize.css    |   8.1.0 |
+| Vitest           |   4.0.8 |
+
+## Infrastructure
+
+* Docker
+* Docker Compose
 * Apache Kafka
 * Apache ZooKeeper
-* OpenPDF
-* Docker
-* Docker Compose
 
-### Frontend
-* Angular 22
-* TypeScript 6
-* Angular Material
-* AG Grid
-* RxJS
-* Tailwind CSS
-* normalize.css
+---
 
-### Infrastructure
+# Requirements
 
-* Docker
-* Docker Compose
+## Backend and Infrastructure
 
-## Requirements
+The following software is required to run the complete application:
 
-The following software is required to run the project:
+* **Docker Desktop**
+* **Docker Compose**
 
-* Docker Desktop
-* Docker Compose
+When running the project using Docker Compose, local installation of the following services is not required:
 
-When using Docker Compose, local installation of PostgreSQL, MongoDB, Kafka, ZooKeeper, and Gradle is not required.
+* PostgreSQL;
+* MongoDB;
+* Apache Kafka;
+* Apache ZooKeeper;
+* Gradle.
 
-## Quick Start
+## Frontend
 
-### 1. Clone the repository
+The frontend can be run separately from the backend.
+
+Required software:
+
+| Software    |       Version |
+| ----------- | ------------: |
+| Node.js     | 22.x or later |
+| npm         | 10.x or later |
+| Angular CLI |        22.1.7 |
+
+The frontend uses **npm** as its package manager.
+
+---
+
+# Quick Start
+
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/AndreyEvtukh/skillbox-java-spring.git
 cd skillbox-java-spring
 ```
 
-### 2. Start the application
+## 2. Start the Backend and Infrastructure
 
-Start all application services using Docker Compose:
+Start all backend and infrastructure services using Docker Compose:
 
 ```bash
 docker compose up --build
@@ -83,96 +199,110 @@ docker compose up --build
 
 Docker Compose starts the following containers:
 
-* `skillbox-java-spring` — Spring Boot application;
-* `skillbox-postgres` — PostgreSQL database;
-* `skillbox-mongodb` — MongoDB database;
-* `skillbox-zookeeper` — Apache ZooKeeper;
-* `skillbox-kafka` — Apache Kafka broker.
+| Container              | Description             |    Port |
+| ---------------------- | ----------------------- | ------: |
+| `skillbox-java-spring` | Spring Boot application |  `8082` |
+| `skillbox-postgres`    | PostgreSQL database     |  `5432` |
+| `skillbox-mongodb`     | MongoDB database        | `27017` |
+| `skillbox-kafka`       | Apache Kafka broker     |  `9092` |
+| `skillbox-zookeeper`   | Apache ZooKeeper        |  `2181` |
 
-The Spring Boot application is available at:
+The backend is available at:
 
 ```text
 http://localhost:8082
 ```
 
-PostgreSQL is available at:
+## 3. Start the Frontend
 
-```text
-localhost:5432
-```
-
-MongoDB is available at:
-
-```text
-localhost:27017
-```
-
-Kafka is available at:
-
-```text
-localhost:9092
-```
-
-ZooKeeper is available at:
-
-```text
-localhost:2181
-```
-
-### 3. Stop the application
-
-To stop all containers:
+Open a separate terminal:
 
 ```bash
-docker compose down
+cd frontend
+npm install
+npm start
 ```
 
-To stop containers and remove PostgreSQL and MongoDB data:
-
-```bash
-docker compose down -v
-```
-
-## Application Architecture
-
-The application uses PostgreSQL as the primary relational database and MongoDB as a separate storage for statistical events.
-
-Kafka is used to transfer statistical events asynchronously from the main application services to the statistics layer.
+The frontend application is available at:
 
 ```text
-                         Docker Compose
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-        ▼                     ▼                     ▼
- Spring Boot             PostgreSQL             MongoDB
-   :8082                    :5432                  :27017
-        │
-        │
-        ├──────────────► Kafka
-        │                :9092
-        │                  │
-        │                  ▼
-        │          Statistics Consumer
-        │                  │
-        │                  ▼
-        │               MongoDB
-        │
-        └──────────────► PostgreSQL
+http://localhost:4202
 ```
 
-### Statistics Flow
+## 4. Open Swagger
 
-User registration and room booking generate statistical events.
+Swagger UI is available at:
 
 ```text
-User Registration
+http://localhost:8082/docs
+```
+
+The API can be tested directly from Swagger UI.
+
+---
+
+# Application Architecture
+
+The application uses a layered architecture with a separate frontend, backend, relational database, statistics storage, and asynchronous messaging infrastructure.
+
+```text
+                    ┌──────────────────────┐
+                    │      Angular 22       │
+                    │       Frontend        │
+                    │        :4202          │
+                    └──────────┬───────────┘
+                               │
+                               │ REST API
+                               ▼
+                    ┌──────────────────────┐
+                    │     Spring Boot       │
+                    │       Backend         │
+                    │        :8082          │
+                    └──────┬─────────┬─────┘
+                           │         │
+                 Business │         │ Statistics events
+                   data    │         │
+                           ▼         ▼
+                    ┌──────────┐  ┌──────────┐
+                    │PostgreSQL│  │  Kafka   │
+                    │  :5432   │  │  :9092   │
+                    └──────────┘  └────┬─────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │    Statistics   │
+                              │     Consumer    │
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                                ┌─────────────┐
+                                │   MongoDB   │
+                                │    :27017   │
+                                └─────────────┘
+```
+
+## Main Data Flow
+
+The main business data is stored in PostgreSQL:
+
+```text
+Angular Frontend
+       │
+       │ REST API
+       ▼
+Spring Boot
        │
        ▼
- USER_REGISTERED event
+PostgreSQL
+```
+
+Statistical events are processed asynchronously:
+
+```text
+Spring Boot
        │
        ▼
-     Kafka
+    Kafka
        │
        ▼
 Statistics Consumer
@@ -181,49 +311,133 @@ Statistics Consumer
     MongoDB
 ```
 
-```text
-Room Booking
-       │
-       ▼
-  ROOM_BOOKED event
-       │
-       ▼
-     Kafka
-       │
-       ▼
-Statistics Consumer
-       │
-       ▼
-    MongoDB
+This separation allows the main business operations to remain independent from statistical processing.
+
+---
+
+# Security
+
+The application uses **Spring Security** with **HTTP Basic Authentication** and role-based access control.
+
+Two roles are supported:
+
+### USER
+
+The `USER` role is intended for registered users and provides access to protected user-level functionality.
+
+### ADMIN
+
+The `ADMIN` role provides access to administrative functionality, including:
+
+* user management;
+* content management;
+* statistics export;
+* other administrator-only endpoints.
+
+Administrative endpoints are protected with role-based authorization.
+
+For example:
+
+```java
+.hasRole("ADMIN")
 ```
 
-The stored statistical data can then be exported to CSV or PDF:
+The application internally uses authorities in the following format:
 
 ```text
-MongoDB
-   │
-   ▼
-Statistics Service
-   │
-   ├──► CSV
-   │
-   └──► PDF
+ROLE_USER
+ROLE_ADMIN
 ```
 
-## Databases
+## Initial Users
 
-### PostgreSQL
+The application is initially populated with two registered users:
 
-PostgreSQL is the primary relational database used to store application data.
+| Email               | Password   | Role    |
+| ------------------- | ---------- | ------- |
+| `admin@example.com` | `Password` | `ADMIN` |
+| `user@example.com`  | `Password` | `USER`  |
 
-It contains the main business entities, including:
+These accounts can be used to test authentication and role-based access control.
+
+The `ADMIN` account provides access to administrator-only endpoints, including user management and statistics export.
+
+The `USER` account can be used to test functionality available to registered users.
+
+Both accounts can be used to authenticate directly in **Swagger UI** using the **Authorize** button and HTTP Basic Authentication.
+
+
+## Swagger Authentication
+
+Protected endpoints can be tested directly from Swagger UI.
+
+Click the **Authorize** button in Swagger UI and enter the user's Basic Authentication credentials.
+
+```text
+Swagger UI
+     │
+     ▼
+┌─────────────────────┐
+│      Authorize      │
+│      Basic Auth     │
+└──────────┬──────────┘
+           │
+           ▼
+     ┌─────────────┐
+     │ USER / ADMIN│
+     └─────────────┘
+```
+
+---
+
+# API Documentation
+
+The complete REST API is documented using **Swagger / OpenAPI**.
+
+All available endpoints, request parameters, request bodies, response models, HTTP status codes, and authentication requirements are described in the OpenAPI specification.
+
+The API is **fully documented and ready for testing directly from Swagger UI**.
+
+## Swagger UI
+
+```text
+http://localhost:8082/docs
+```
+
+Swagger UI allows developers to:
+
+* view all available REST endpoints;
+* inspect request parameters;
+* inspect request and response DTOs;
+* configure Basic Authentication;
+* execute API requests;
+* inspect HTTP responses;
+* test protected endpoints using `USER` or `ADMIN` credentials.
+
+## OpenAPI Specification
+
+```text
+http://localhost:8082/v1/api-docs
+```
+
+The OpenAPI specification can also be used by external API development and testing tools.
+
+---
+
+# Databases
+
+## PostgreSQL
+
+PostgreSQL is the **primary relational database** of the application.
+
+It stores the main business entities:
 
 * users;
 * hotels;
 * rooms;
 * bookings.
 
-Default Docker connection parameters:
+### Docker Connection
 
 ```text
 Database: skillbox_db
@@ -233,46 +447,56 @@ Host: db
 Port: 5432
 ```
 
-When the application runs inside Docker, it connects to PostgreSQL using:
+The application connects to PostgreSQL inside Docker using:
 
 ```text
 jdbc:postgresql://db:5432/skillbox_db
 ```
 
-When Spring Boot runs locally outside Docker:
+When running Spring Boot locally outside Docker:
 
 ```text
 jdbc:postgresql://localhost:5432/skillbox_db
 ```
 
-### MongoDB
+## MongoDB
 
-MongoDB is used as a separate storage for statistical events received through Kafka.
+MongoDB is used as a dedicated storage for statistical events.
 
-The `statistics` collection stores events such as:
+The statistics collection is:
+
+```text
+statistics
+```
+
+The following event types are currently stored:
 
 ```text
 USER_REGISTERED
 ROOM_BOOKED
 ```
 
-Default Docker connection:
+Docker connection:
 
 ```text
 mongodb://mongodb:27017/statistics
 ```
 
-The MongoDB UUID representation is configured using the standard UUID representation required by the MongoDB Java driver.
+MongoDB UUID handling is configured using the standard UUID representation required by the MongoDB Java driver.
 
-## Statistics
+---
 
-The application implements a separate statistics layer based on Apache Kafka and MongoDB.
+# Statistics
 
-Two statistical event types are currently supported:
+The application implements a dedicated statistics layer based on **Apache Kafka** and **MongoDB**.
 
-### User Registration
+Two statistical event types are currently supported.
 
-A `USER_REGISTERED` event contains:
+## User Registration Event
+
+The `USER_REGISTERED` event is generated when a new user is registered.
+
+The event contains:
 
 ```text
 eventId
@@ -281,9 +505,22 @@ occurredAt
 userId
 ```
 
-### Room Booking
+Example:
 
-A `ROOM_BOOKED` event contains:
+```json
+{
+  "eventId": "uuid",
+  "eventType": "USER_REGISTERED",
+  "occurredAt": "2026-09-08T10:00:00Z",
+  "userId": "uuid"
+}
+```
+
+## Room Booking Event
+
+The `ROOM_BOOKED` event is generated when a room is successfully booked.
+
+The event contains:
 
 ```text
 eventId
@@ -294,22 +531,110 @@ checkIn
 checkOut
 ```
 
-Events are published to separate Kafka topics:
+Example:
+
+```json
+{
+  "eventId": "uuid",
+  "eventType": "ROOM_BOOKED",
+  "occurredAt": "2026-09-08T10:05:00Z",
+  "userId": "uuid",
+  "checkIn": "2026-09-10",
+  "checkOut": "2026-09-15"
+}
+```
+
+---
+
+# Kafka
+
+Apache Kafka is used as an **asynchronous event broker** for the statistics layer.
+
+Two Kafka topics are used:
 
 ```text
 user-registered
 room-booked
 ```
 
-The statistics consumer receives events from Kafka and stores them in MongoDB.
+The application publishes events to Kafka after the corresponding business operation is completed.
 
-## Statistics Export
+The statistics consumer listens to these topics and stores received events in MongoDB.
 
-Administrators can export all stored statistical events.
-
-### CSV Export
+## Kafka Flow
 
 ```text
+User Registration
+       │
+       ▼
+USER_REGISTERED
+       │
+       ▼
+user-registered
+       │
+       ▼
+Kafka
+       │
+       ▼
+Statistics Consumer
+       │
+       ▼
+MongoDB
+```
+
+```text
+Room Booking
+       │
+       ▼
+ROOM_BOOKED
+       │
+       ▼
+room-booked
+       │
+       ▼
+Kafka
+       │
+       ▼
+Statistics Consumer
+       │
+       ▼
+MongoDB
+```
+
+## Kafka Connection
+
+Kafka is exposed on the host at:
+
+```text
+localhost:9092
+```
+
+The Spring Boot application uses the Docker internal address:
+
+```text
+kafka:29092
+```
+
+ZooKeeper is available at:
+
+```text
+localhost:2181
+```
+
+---
+
+# Statistics Export
+
+Statistical data stored in MongoDB can be exported by administrators.
+
+The export layer supports two formats:
+
+* CSV;
+* PDF.
+
+## CSV Export
+
+```http
 GET /api/v1/statistics/csv
 ```
 
@@ -319,9 +644,20 @@ The endpoint generates and downloads:
 statistics.csv
 ```
 
-### PDF Export
+The CSV file contains:
 
 ```text
+eventId
+eventType
+occurredAt
+userId
+checkIn
+checkOut
+```
+
+## PDF Export
+
+```http
 GET /api/v1/statistics/pdf
 ```
 
@@ -331,36 +667,15 @@ The endpoint generates and downloads:
 statistics.pdf
 ```
 
-Statistics export endpoints are available to administrators only.
+The PDF contains a tabular representation of the stored statistical events.
 
-## Kafka
+Both statistics export endpoints are available to administrators only.
 
-Apache Kafka is used as an asynchronous event broker for the statistics layer.
+---
 
-The application publishes two types of events:
+# Database Migrations
 
-```text
-user-registered
-room-booked
-```
-
-Kafka runs together with ZooKeeper in Docker Compose.
-
-Internal application communication uses:
-
-```text
-kafka:29092
-```
-
-Kafka is exposed on the host at:
-
-```text
-localhost:9092
-```
-
-## Database Migrations
-
-Flyway is used to manage the PostgreSQL database schema.
+**Flyway** is used to manage the PostgreSQL database schema.
 
 Migration files are located in:
 
@@ -370,7 +685,9 @@ src/main/resources/db/migration/
 
 Flyway automatically checks and applies available migrations when the application starts.
 
-Hibernate is configured with:
+Hibernate does not modify the database schema.
+
+The following configuration is used:
 
 ```yaml
 spring:
@@ -379,30 +696,225 @@ spring:
       ddl-auto: validate
 ```
 
-This means Hibernate does not modify the database schema. It only validates the existing schema against the JPA entities.
+This means Hibernate only validates the existing database schema against the JPA entities.
 
-## API Documentation
+Database structure changes are managed exclusively through Flyway migrations.
 
-The REST API is documented using SpringDoc OpenAPI.
+---
 
-Swagger UI:
+# Frontend
 
-```text
-http://localhost:8082/docs
-```
-
-OpenAPI specification:
+The frontend client is located in the:
 
 ```text
-http://localhost:8082/v1/api-docs
+frontend/
 ```
 
-Administrative endpoints require authentication and the appropriate administrator role.
+directory.
 
-## Project Structure
+The frontend is implemented using **Angular 22** and communicates with the Spring Boot backend through the REST API.
+
+## Frontend Prerequisites
+
+| Software    |       Version |
+| ----------- | ------------: |
+| Node.js     | 22.x or later |
+| npm         | 10.x or later |
+| Angular CLI |        22.1.7 |
+
+The frontend uses **npm** as the package manager.
+
+## Frontend Stack
+
+| Technology       | Version |
+| ---------------- | ------: |
+| Angular          |  22.1.5 |
+| TypeScript       |   6.0.3 |
+| Angular Material |  22.1.5 |
+| AG Grid Angular  |  36.1.0 |
+| RxJS             |   7.8.2 |
+| Tailwind CSS     |   4.3.3 |
+| normalize.css    |   8.1.0 |
+| Vitest           |   4.0.8 |
+
+## Development Server
+
+Start the frontend from the `frontend` directory:
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The development server runs on:
+
+```text
+http://localhost:4202
+```
+
+## Production Build
+
+Create a production build:
+
+```bash
+cd frontend
+npm run build
+```
+
+The production build is generated in the Angular `dist` directory.
+
+## Frontend Structure
+
+```text
+frontend/
+├── src/
+│   ├── app/
+│   ├── assets/
+│   ├── main.ts
+│   └── styles.css
+├── public/
+├── angular.json
+├── package.json
+├── tsconfig.json
+└── tsconfig.app.json
+```
+
+## Frontend / Backend Communication
+
+The frontend and backend are developed as separate applications:
+
+```text
+┌──────────────────────────┐
+│       Angular 22         │
+│        Frontend          │
+│         :4202            │
+└────────────┬─────────────┘
+             │
+             │ REST API
+             ▼
+┌──────────────────────────┐
+│       Spring Boot        │
+│         Backend          │
+│          :8082           │
+└──────────────────────────┘
+```
+
+---
+
+# Docker
+
+The project includes:
+
+* `Dockerfile` for building the Spring Boot application;
+* `docker-compose.yml` for running the backend and infrastructure services.
+
+Docker Compose provides the complete backend environment:
+
+```text
+                         Docker Compose
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+          ▼                   ▼                   ▼
+   Spring Boot App        PostgreSQL           MongoDB
+       :8082                 :5432              :27017
+          │
+          ▼
+        Kafka
+       :9092
+          │
+          ▼
+      ZooKeeper
+       :2181
+```
+
+## Docker Services
+
+```text
+skillbox-java-spring
+skillbox-postgres
+skillbox-mongodb
+skillbox-kafka
+skillbox-zookeeper
+```
+
+Internal Docker communication:
+
+```text
+PostgreSQL → jdbc:postgresql://db:5432/skillbox_db
+MongoDB    → mongodb://mongodb:27017/statistics
+Kafka      → kafka:29092
+```
+
+---
+
+# Local Development Without Docker
+
+The backend can also be started directly using Gradle.
+
+For local development, PostgreSQL must be available on:
+
+```text
+localhost:5432
+```
+
+If the statistics functionality is enabled, MongoDB and Kafka must also be available locally.
+
+## Start the Application
+
+Linux / macOS:
+
+```bash
+./gradlew bootRun
+```
+
+Windows:
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+## Build the Project
+
+Linux / macOS:
+
+```bash
+./gradlew build
+```
+
+Windows:
+
+```powershell
+.\gradlew.bat build
+```
+
+## Run the JAR
+
+After building:
+
+```bash
+java -jar build/libs/skillbox-java-spring-1.0.1.jar
+```
+
+---
+
+# Project Structure
 
 ```text
 skillbox-java-spring/
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── assets/
+│   │   ├── main.ts
+│   │   └── styles.css
+│   ├── public/
+│   ├── angular.json
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── tsconfig.app.json
+│
 ├── src/
 │   ├── main/
 │   │   ├── java/
@@ -416,9 +928,7 @@ skillbox-java-spring/
 │   │   │       │   ├── logout/
 │   │   │       │   ├── room/
 │   │   │       │   └── user/
-│   │   │       │   
 │   │   │       ├── entity/
-│   │   │       ├── exceptions/
 │   │   │       ├── exceptions/
 │   │   │       ├── repositories/
 │   │   │       ├── security/
@@ -430,11 +940,12 @@ skillbox-java-spring/
 │   │   │           ├── entity/
 │   │   │           ├── repository/
 │   │   │           └── service/
-│   │   │           
+│   │   │
 │   │   └── resources/
 │   │       ├── db/
 │   │       │   └── migration/
 │   │       └── application.yaml
+│   │
 │   └── test/
 │
 ├── Dockerfile
@@ -445,75 +956,9 @@ skillbox-java-spring/
 └── gradlew.bat
 ```
 
-## Docker
+---
 
-The project includes a `Dockerfile` for building the Spring Boot application and a `docker-compose.yml` for running all required infrastructure services.
-
-```text
-                         Docker Compose
-                              │
-          ┌───────────────────┼───────────────────┐
-          │                   │                   │
-          ▼                   ▼                   ▼
-   Spring Boot App        PostgreSQL           MongoDB
-       :8082                 :5432              :27017
-          │
-          │
-          ▼
-        Kafka
-       :9092
-          │
-          │
-          ▼
-      ZooKeeper
-       :2181
-```
-
-The Spring Boot application communicates with:
-
-```text
-PostgreSQL → jdbc:postgresql://db:5432/skillbox_db
-MongoDB    → mongodb://mongodb:27017/statistics
-Kafka      → kafka:29092
-```
-
-## Local Development Without Docker
-
-To run the Spring Boot application directly using Gradle, PostgreSQL must be available on `localhost:5432`.
-
-If statistics functionality is enabled, MongoDB and Kafka must also be available locally with the corresponding configuration.
-
-Run the application:
-
-```bash
-./gradlew bootRun
-```
-
-For Windows:
-
-```powershell
-.\gradlew.bat bootRun
-```
-
-Build the project:
-
-```bash
-./gradlew build
-```
-
-For Windows:
-
-```powershell
-.\gradlew.bat build
-```
-
-After building, the application can be started using:
-
-```bash
-java -jar build/libs/skillbox-java-spring-1.0.1.jar
-```
-
-## Version Control
+# Version Control
 
 The main stable branch is:
 
@@ -536,9 +981,11 @@ feature/...
 
 Completed versions of the project are merged into the `main` branch.
 
-## Project Tasks
+---
 
-### Task 1. Environment Setup
+# Project Tasks
+
+## Task 1 — Environment Setup
 
 The initial project environment was prepared, including:
 
@@ -555,40 +1002,53 @@ The initial project environment was prepared, including:
 * PostgreSQL connection configuration;
 * initial database migration.
 
-### Task 9. Hotel and Room Filtering
+## Task 9 — Hotel and Room Filtering
 
 Implemented paginated search and filtering of hotels and rooms according to the specified criteria.
 
-The filtering layer uses Spring Data JPA specifications and supports pagination through Spring Data `Pageable`.
+The filtering layer uses Spring Data JPA Specifications and supports pagination through Spring Data `Pageable`.
 
-### Task 10. Booking
+Implemented functionality includes:
+
+* filtering by hotel ID;
+* filtering by hotel name;
+* filtering by rating;
+* room filtering;
+* pagination;
+* total record count in paginated responses.
+
+## Task 10 — Booking
 
 Implemented room booking functionality, including:
 
-* room and user validation;
+* room validation;
+* user validation;
 * booking period validation;
 * prevention of overlapping bookings;
-* storage of booking information in PostgreSQL.
+* storage of booking information in PostgreSQL;
+* generation of a room booking statistical event.
 
-### Task 11. Statistics Collection Layer
+## Task 11 — Statistics Collection Layer
 
 Implemented a separate statistics collection layer using Apache Kafka and MongoDB.
 
 The implementation includes:
 
-* Kafka and ZooKeeper integration;
+* Kafka integration;
+* ZooKeeper integration;
 * MongoDB integration;
 * statistical event models;
 * user registration events;
 * room booking events;
-* Kafka topics for statistical events;
-* Kafka consumer for processing events;
-* MongoDB repository and service;
+* separate Kafka topics;
+* Kafka consumer;
+* MongoDB repository;
+* statistics service;
 * CSV export;
 * PDF export;
 * administrator-only statistics endpoints.
 
-The implemented event flow is:
+The complete event flow is:
 
 ```text
 UserService / BookingService
@@ -606,108 +1066,15 @@ StatisticsService
        MongoDB
           │
           ▼
- StatisticsExportService
+StatisticsExportService
           │
        ┌──┴──┐
        ▼     ▼
       CSV   PDF
 ```
 
-## Frontend
+---
 
-The frontend client is located in the `frontend` directory of the project.
+# License
 
-The frontend application is built with **Angular 22** and communicates with the Spring Boot backend through the REST API.
-
-### Frontend Prerequisites
-
-The following software is required to build and run the frontend application:
-
-| Software    |       Version |
-| ----------- | ------------: |
-| Node.js     | 22.x or later |
-| npm         | 10.x or later |
-| Angular CLI |        22.1.7 |
-
-### Frontend Stack
-
-| Technology       | Version |
-| ---------------- | ------: |
-| Angular          |  22.1.5 |
-| TypeScript       |   6.0.3 |
-| Angular Material |  22.1.5 |
-| AG Grid Angular  |  36.1.0 |
-| RxJS             |   7.8.2 |
-| Tailwind CSS     |   4.3.3 |
-| normalize.css    |   8.0.1 |
-| Vitest           |   4.0.8 |
-
-The frontend uses **npm** as the package manager.
-
-### Development Server
-
-The Angular development server runs on port `4202`.
-
-Start the frontend from the `frontend` directory:
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-The frontend application will be available at:
-
-```text
-http://localhost:4202
-```
-
-### Production Build
-
-To create a production build:
-
-```bash
-cd frontend
-npm run build
-```
-
-The production build is generated in the Angular `dist` directory.
-
-### Frontend Structure
-
-```text
-frontend/
-├── src/
-│   ├── app/
-│   ├── assets/
-│   ├── main.ts
-│   └── styles.css
-├── public/
-├── angular.json
-├── package.json
-├── tsconfig.json
-└── tsconfig.app.json
-```
-
-The frontend and backend are developed as separate applications:
-
-```text
-┌──────────────────────────┐
-│      Angular 22          │
-│      Frontend            │
-│      :4202               │
-└────────────┬─────────────┘
-             │
-             │ REST API
-             ▼
-┌──────────────────────────┐
-│      Spring Boot         │
-│      Backend             │
-│      :8082               │
-└──────────────────────────┘
-```
-
-
-## License
-
-This project was developed as part of a Skillbox diploma project.
+This project was developed as part of a **Skillbox diploma project**.
