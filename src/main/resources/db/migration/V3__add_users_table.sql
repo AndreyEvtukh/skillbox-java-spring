@@ -20,7 +20,7 @@ INSERT INTO users (id,
                    role,
                    active,
                    password_hash)
-VALUES (gen_random_uuid(),
+VALUES ('c083ce11-b83f-44cf-9a15-ab1df7f39814',
         'admin@example.com',
         'Administrator',
 

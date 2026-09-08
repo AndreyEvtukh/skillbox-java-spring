@@ -16,7 +16,7 @@ import java.util.UUID;
 /**
  * Request data required to create a room.
  *
- * <p>The {@code hotelId} identifies the hotel to which a newly created room belongs.
+ * <p>The {@code hotelIds} identifies the hotel to which a newly created room belongs.
  * The service layer resolves this identifier to the corresponding hotel entity.</p>
  */
 @Data

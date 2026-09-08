@@ -1,6 +1,6 @@
 package com.diploma.skillboxjavaspring.services;
 
-import com.diploma.skillboxjavaspring.dto.HotelPageResponseDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.HotelPageResponseDTO;
 import com.diploma.skillboxjavaspring.dto.hotels.*;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
@@ -177,11 +177,12 @@ public class HotelService {
     }
 
     /**
-     * Retrieves hotels using filtering and pagination.
+     * Finds hotels matching the supplied filter and returns the requested page.
      *
-     * @param filter   filter parameters
-     * @param pageable pagination parameters
-     * @return paginated hotel response with total number of matching hotels
+     * @param filter   the optional hotel filtering criteria
+     * @param pageable pagination and sorting configuration
+     * @return a page response containing the total number of matching hotels,
+     *         the current page number, and the mapped hotel data
      */
     @Transactional(readOnly = true)
     public HotelPageResponseDTO findHotels(HotelFilterDTO filter, Pageable pageable) {
@@ -197,6 +198,6 @@ public class HotelService {
                 .map(hotelMapper::toResponseDTO)
                 .toList();
 
-        return new HotelPageResponseDTO(page.getTotalElements(), hotels);
+        return new HotelPageResponseDTO(page.getTotalElements(), page.getNumber(), hotels);
     }
 }

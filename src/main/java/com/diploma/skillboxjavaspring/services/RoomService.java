@@ -1,8 +1,6 @@
 package com.diploma.skillboxjavaspring.services;
 
-import com.diploma.skillboxjavaspring.dto.room.RoomRequestDTO;
-import com.diploma.skillboxjavaspring.dto.room.RoomResponseDTO;
-import com.diploma.skillboxjavaspring.dto.room.RoomUpdateDTO;
+import com.diploma.skillboxjavaspring.dto.room.*;
 import com.diploma.skillboxjavaspring.entity.Hotel;
 import com.diploma.skillboxjavaspring.entity.Room;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
@@ -10,11 +8,16 @@ import com.diploma.skillboxjavaspring.exceptions.RoomNotFoundException;
 import com.diploma.skillboxjavaspring.mapper.RoomMapper;
 import com.diploma.skillboxjavaspring.repositories.HotelRepository;
 import com.diploma.skillboxjavaspring.repositories.RoomRepository;
+import com.diploma.skillboxjavaspring.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -131,5 +134,30 @@ public class RoomService {
         log.debug("<= Delete {}: SUCCESS", ID);
 
         roomRepository.delete(room);
+    }
+
+    /**
+     * Retrieves rooms using filtering and pagination.
+     *
+     * @param filter   filter parameters
+     * @param pageable pagination parameters
+     * @return paginated room response with total number of matching rooms
+     */
+    @Transactional(readOnly = true)
+    public RoomPageResponseDTO findRooms(RoomFilterDTO filter, Pageable pageable) {
+        log.debug("=> Find rooms with filter: {}, pageable: {}", filter, pageable);
+
+        Specification<Room> specification = RoomSpecification.filter(filter);
+
+        Page<Room> page = roomRepository
+                .findAll(specification, pageable);
+
+        List<RoomResponseDTO> rooms = page
+                .getContent()
+                .stream()
+                .map(roomMapper::toResponseDTO)
+                .toList();
+
+        return new RoomPageResponseDTO(page.getTotalElements(),  page.getNumber(), rooms);
     }
 }
