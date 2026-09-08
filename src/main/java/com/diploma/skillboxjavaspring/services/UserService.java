@@ -2,7 +2,6 @@ package com.diploma.skillboxjavaspring.services;
 
 import com.diploma.skillboxjavaspring.dto.user.UserRequestDTO;
 import com.diploma.skillboxjavaspring.dto.user.UserResponseDTO;
-import com.diploma.skillboxjavaspring.dto.user.UserUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.Role;
 import com.diploma.skillboxjavaspring.entity.User;
 import com.diploma.skillboxjavaspring.exceptions.UserEmailExistedException;
@@ -108,27 +107,27 @@ public class UserService {
      * Updates an existing user.
      *
      * @param id            the unique ID of the user to update
-     * @param userUpdateDTO the updated user data
+     * @param request the updated user data
      * @return the updated user data
      * @throws UserIDNotFoundException   if no user has the specified ID
      * @throws UserNameExistedException  if the username is already in use
      * @throws UserEmailExistedException if the email address is already in use
      */
     @Transactional
-    public UserResponseDTO update(UUID id, UserUpdateDTO userUpdateDTO) {
-        log.debug("=> Update user {}", userUpdateDTO);
+    public UserResponseDTO update(UUID id, UserRequestDTO request) {
+        log.debug("=> Update user {}", request);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserIDNotFoundException(id));
 
-        userMapper.updateEntity(userUpdateDTO, user);
+        userMapper.updateEntity(request, user);
         User updated = userRepository.save(user);
+        UserResponseDTO response = userMapper.toResponseDTO(updated);
+        response.setEvent("Edit");
 
-        UserResponseDTO userResponseDTO = userMapper.toResponseDTO(updated);
-        userResponseDTO.setEvent("Edit");
-        log.debug("<= Updated user {}", userResponseDTO);
+        log.debug("<= Updated user {}", response);
 
-        return userResponseDTO;
+        return response;
     }
 
     /**

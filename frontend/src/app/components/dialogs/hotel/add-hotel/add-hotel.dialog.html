@@ -1,0 +1,133 @@
+<section
+  class="bg-dark-2 flex flex-col items-center h-full px-8 pt-8 pb-4 overflow-hidden rounded-md border border-dark-3 justify-center text-dark-9">
+  <div class="flex flex-col items-center justify-center w-full gap-8 text-14">
+    <h2 class="uppercase font-medium">Add New Hotel</h2>
+
+    <form class="flex flex-col justify-center gap-0 max-w-2xs w-full" [formGroup]="form"
+          [class.waiting]="loading()">
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "Hotel name" }}</mat-label>
+        <input matInput
+               id="name"
+               type="text"
+               formControlName="name"
+               class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4"
+               appMarkControlOnBlur
+               required/>
+        @if (form.controls['name'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['name'].errors?.['required']) {
+              <small> {{ "Hotel name" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "Title" }}</mat-label>
+        <input matInput
+               id="title"
+               type="text"
+               formControlName="title"
+               class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4"
+               appMarkControlOnBlur
+               required/>
+        @if (form.controls['title'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['title'].errors?.['required']) {
+              <small> {{ "Hotel title" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "City" }}</mat-label>
+        <input matInput
+               id="city"
+               type="text"
+               formControlName="city"
+               class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4"
+               appMarkControlOnBlur
+               required/>
+        @if (form.controls['city'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['city'].errors?.['required']) {
+              <small> {{ "City" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "Address" }}</mat-label>
+        <input matInput
+               id="address"
+               type="text"
+               formControlName="address"
+               class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4"
+               appMarkControlOnBlur
+               required/>
+        @if (form.controls['address'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['address'].errors?.['required']) {
+              <small> {{ "Address" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "Distance from center" }}</mat-label>
+        <input matInput
+               id="distance"
+               type="number"
+               step="0.1"
+               min="0"
+               formControlName="distance"
+               class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4"
+               appMarkControlOnBlur
+               required/>
+        @if (form.controls['distance'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['distance'].errors?.['required']) {
+              <small> {{ "Distance" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+    </form>
+
+    <div class="relative flex flex-row justify-center items-center !h-6 !w-full">
+      @if (loading()) {
+        <mat-spinner @spinerAnimation class="absolute !h-6 !w-6"></mat-spinner>
+      } @else if (info()?.ok === false && info().message) {
+        <p @spinerAnimation
+           class="flex justify-center text-center max-w-2xs w-full font-monospace absolute whitespace-pre-line
+               text-green py-2 px-4 bg-dark-1 rounded-sm border border-dark-6 text-10 text-dark-8"
+           (click)="$event.stopImmediatePropagation()">
+          {{ info().message }}
+          <span
+            class="top-1/2 transform -translate-y-1/2 absolute right-1 w-4 h-4 bg-dark-3 flex justify-center items-center rounded-full cursor-pointer"
+            (click)="removeInfo()">&times;</span>
+        </p>
+      }
+    </div>
+  </div>
+
+  <mat-dialog-actions align="end" class="w-full flex flex-col justify-center gap-6">
+    <button matButton="filled"
+            class="uppercase max-w-2xs h-10 w-full rounded-sm p-2 !font-medium cursor-pointer transition-all duration-200
+                   disabled:bg-dark-3 disabled:text-dark-6 disabled:!border-dark-6 disabled:cursor-not-allowed
+                   bg-green text-dark-2 border-green border text-14"
+            [disabled]="form.invalid"
+            (click)="add()"
+    >
+      <span class="text-14">Add</span>
+    </button>
+
+    <button matButton="filled" class="cursor-pointer text-14" (click)="close()"> <span class="text-14">Cancel</span></button>
+
+  </mat-dialog-actions>
+</section>

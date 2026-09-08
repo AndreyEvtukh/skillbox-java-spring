@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, WritableSignal } from '@angular/core';
 import { MatDialogActions, MatDialogRef } from "@angular/material/dialog";
 import { MatFormField, MatInputModule, MatLabel } from "@angular/material/input";
 import {
@@ -9,40 +9,27 @@ import {
 } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { AUTH } from '../../../app.constants';
+import { AUTH } from '../../../../app.constants';
 import { MatIcon } from '@angular/material/icon';
-import { NoWhitespaceDirective } from '../../../directives/no-whitespace.directive';
-import { ApplicationDialogClass } from '../app.dialog.class';
+import { NoWhitespaceDirective } from '../../../../directives/no-whitespace.directive';
+import { ApplicationDialogClass } from '../../app.dialog.class';
+import { UsersService } from '../../../../services/users.service';
 
 @Component({
   selector: 'app-add-user-dialog',
   imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective],
-  templateUrl: `add-user-dialog.html`,
-  styleUrl: 'add-user-dialog.css',
+  templateUrl: `add-user.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
 export default class AddUserDialogComponent extends ApplicationDialogClass implements OnInit {
   protected component: typeof AddUserDialogComponent = AddUserDialogComponent;
   protected override dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<AddUserDialogComponent>, { optional: true });
+  protected usersService: UsersService = inject(UsersService);
 
   protected readonly loading: WritableSignal<boolean> = this.authService.waitUserAddSpinner;
 
-  get emailIsInvalid() {
-    const { errors } = this.form.controls["email"];
-    return errors?.["email"] || errors?.["pattern"];
-  }
-
   constructor() {
     super();
-
-    effect(() => {
-      const user = this.authService.user();
-      this.user.set(user);
-
-      if (this.error()) {
-        this.setInfo({ ok: false, message: this.error() });
-      }
-    });
   }
 
   public ngOnInit(): void {
@@ -63,16 +50,23 @@ export default class AddUserDialogComponent extends ApplicationDialogClass imple
     });
   }
 
-  protected add() {
+  protected save() {
     const { username, email, password } = this.form.getRawValue();
+    this.usersService.add({ username, email, password })
+      .subscribe({
+      next: res => {
+        console.log('[ADD User]:', res);
 
-    try {
-      this.authService.addUser(username, email, password);
-      this.removeInfo();
-      this.close();
-    } catch (err) {
-      console.error(err)
-    }
+        this.removeInfo();
+        this.close({ ok: true });
+      },
 
+      error: error => {
+        console.error(error)
+
+        const message = error.error?.message || 'Failed to add User';
+        this.setInfo({ ok: false, message });
+      }
+    });
   }
 }

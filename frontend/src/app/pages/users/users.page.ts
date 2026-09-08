@@ -1,10 +1,9 @@
-import { Component, effect, inject, signal, WritableSignal, } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { ApplicationPageClass } from '../app.pages.class';
 import ForRegisteredOnlyController from '../../components/for-registered-only/forRegisteredOnly';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridOptions } from 'ag-grid-community';
-import { User } from '../../services/auth-service';
-import { DialogsService } from '../../services/dialogs.service';
+import { User, UsersService } from '../../services/users.service';
 
 @Component({
   imports: [
@@ -12,17 +11,13 @@ import { DialogsService } from '../../services/dialogs.service';
     AgGridAngular
   ],
   selector: 'app-users-page',
-  styleUrl: './users.page.css',
   templateUrl: './users.page.html',
 })
 export default class UsersPageController extends ApplicationPageClass {
-  protected readonly rowData: WritableSignal<any> = signal([]);
-  protected dialogsService: DialogsService = inject(DialogsService);
-
+  protected readonly usersService: UsersService = inject(UsersService);
 
   protected readonly columnDefs: ColDef[] = [
-    { field: 'id', headerName: 'User ID', type: 'idCol' },
-    { field: 'email', headerName: 'Email', type: 'emailCol',  sort: 'asc' },
+    { field: 'email', headerName: 'Email', type: 'emailCol', sort: 'asc' },
     { field: 'username', headerName: 'User Name', type: 'usernameCol' },
     { field: 'role', headerName: 'User Role', type: 'roleCol' },
     { field: 'active', headerName: 'Status', type: 'statusCol' },
@@ -30,7 +25,6 @@ export default class UsersPageController extends ApplicationPageClass {
   ];
 
   protected readonly columnTypes = {
-    idCol: { flex: 1.2, minWidth: 300, },
     emailCol: { flex: 0.8, minWidth: 200, },
     usernameCol: { flex: 0.8, minWidth: 300, },
     roleCol: { flex: 0.4, minWidth: 100, },
@@ -66,6 +60,7 @@ export default class UsersPageController extends ApplicationPageClass {
 
   constructor() {
     super();
+
     effect(() => {
       const user = this.user();
 
@@ -78,34 +73,14 @@ export default class UsersPageController extends ApplicationPageClass {
   }
 
   private getUsers() {
-    try {
-      this.http.get(`${this.url}/user/all`, { params: { _: Date.now() } }).subscribe(
-        {
-          next: (data: any) => {
-            this.rowData.set(data);
-          },
-          error: error => {
-            console.log(error)
-          }
-        }
-      )
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  addUser() {
-    if (!this.isAdmin()) {
-      return this.dialogsService.showNoPermissionsDialog();
-    }
-
-    return this.dialogsService.showAddUserDialog()
-      .afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.getUsers();
-        }
-      });
+    this.usersService.getAll().subscribe({
+      next: (data) => {
+        this.rowData.set(data);
+      },
+      error: error => {
+        console.log(error)
+      }
+    });
   }
 
   onCellClicked(event: any): void {
@@ -143,6 +118,20 @@ export default class UsersPageController extends ApplicationPageClass {
     return result.innerHTML;
   }
 
+  addUser() {
+    if (!this.isAdmin()) {
+      return this.dialogsService.showNoPermissionsDialog();
+    }
+
+    return this.dialogsService.showAddUserDialog()
+      .afterClosed()
+      .subscribe(result => {
+        if (result?.ok) {
+          this.getUsers();
+        }
+      });
+  }
+
   editUser(user: User) {
     if (!this.isAdmin()) {
       return this.dialogsService.showNoPermissionsDialog();
@@ -151,7 +140,7 @@ export default class UsersPageController extends ApplicationPageClass {
     return this.dialogsService.showEditUserDialog({ user })
       .afterClosed()
       .subscribe(result => {
-        if (result) {
+        if (result?.ok) {
           this.getUsers();
         }
       });
@@ -163,14 +152,16 @@ export default class UsersPageController extends ApplicationPageClass {
     }
 
     const config = {
-      message: "Are you sure you want to delete this user?",
-      onConfirm: () => this.authService.deleteUser(user.id!)
+      html: `Are you sure you want to delete <span class="font-medium">${user.username}</span>?`,
+      confirmButtonText: 'Delete',
+      onConfirm: () => this.usersService.delete(user)
     }
 
     return this.dialogsService.showConfirmationDialog(config)
       .afterClosed()
       .subscribe(result => {
-        if (result) {
+        if (result?.ok) {
+          console.log(`[DELETE User]: ${user.id}`);
           this.getUsers();
         }
       });

@@ -2,7 +2,6 @@ package com.diploma.skillboxjavaspring.mapper;
 
 import com.diploma.skillboxjavaspring.dto.user.UserRequestDTO;
 import com.diploma.skillboxjavaspring.dto.user.UserResponseDTO;
-import com.diploma.skillboxjavaspring.dto.user.UserUpdateDTO;
 import com.diploma.skillboxjavaspring.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -39,5 +38,5 @@ public interface UserMapper {
      * @param user the entity to update
      */
     @Mapping(target = "passwordHash", ignore = true)
-    User updateEntity(UserUpdateDTO dto, @MappingTarget User user);
+    User updateEntity(UserRequestDTO dto, @MappingTarget User user);
 }

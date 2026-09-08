@@ -1,1 +1,12 @@
-56
+@if (!user()?.email) {
+  <div class="flex flex-col items-center justify-center h-1/2">
+    <app-for-registered-only-page></app-for-registered-only-page>
+  </div>
+} @else if (user()?.email) {
+  <article class="flex flex-col items-center justify-center h-3/4">
+    <div
+      class="flex flex-col w-auto border border-dark-6 rounded-md bg-dark-2 relative z-10 text-14 font-mono text-dark-8 p-12 leading-relaxed">
+      <p class="text-green"> Page is under construction!</p>
+    </div>
+  </article>
+}

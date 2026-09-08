@@ -1,7 +1,7 @@
 import { Component, inject, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import LoginDialogComponent from '../dialogs/login/login-dialog';
-import { AuthService, User } from '../../services/auth-service';
+import { AuthService } from '../../services/auth.service';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { AUTH, ICONS } from '../../app.constants';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
@@ -10,6 +10,7 @@ import { ConfirmationDialogController } from '../dialogs/confirmation/confirmati
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { DialogsService } from '../../services/dialogs.service';
+import { User } from '../../services/users.service';
 
 @Component({
   imports: [

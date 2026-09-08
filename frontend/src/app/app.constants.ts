@@ -47,8 +47,9 @@ export const ICONS = {
 export interface ConfirmationDialogConfig {
   title?: string;
   message?: string;
-  confirm?: string;
-  cancel?: string;
+  html?: string;
+  confirmButtonText?: string;
+  cancelButtonText?: string;
   onConfirm?: () => void;
   onCancel?: () => void;
 }

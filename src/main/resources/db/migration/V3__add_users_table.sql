@@ -14,17 +14,20 @@ CREATE TABLE IF NOT EXISTS users
         UNIQUE (email)
 );
 
-INSERT INTO users (id,
-                   email,
-                   username,
-                   role,
-                   active,
-                   password_hash)
+INSERT INTO users (id, email, username, role, active, password_hash)
 VALUES ('c083ce11-b83f-44cf-9a15-ab1df7f39814',
         'admin@example.com',
         'Administrator',
-
         'ADMIN',
+        false,
+        '$2y$10$iiyysNTMIMk9onnZTykeiuZgNnAKT/1aBYW0G1fR80qQn/yhqzjVm')
+ON CONFLICT (email) DO NOTHING;
+
+INSERT INTO users (id, email, username, role, active, password_hash)
+VALUES ('c078ce11-b43f-44cf-9a15-ab1df1f32317',
+        'user@example.com',
+        'User',
+        'USER',
         false,
         '$2y$10$iiyysNTMIMk9onnZTykeiuZgNnAKT/1aBYW0G1fR80qQn/yhqzjVm')
 ON CONFLICT (email) DO NOTHING;

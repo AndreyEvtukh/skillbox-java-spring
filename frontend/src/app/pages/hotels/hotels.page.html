@@ -1,5 +1,27 @@
-@if(!user()?.email) {
+@if (!user()?.email) {
   <div class="flex flex-col items-center justify-center h-1/2">
     <app-for-registered-only-page></app-for-registered-only-page>
   </div>
+} @else if (user()?.email) {
+  <section class="flex flex-col items-center h-full p-8">
+
+    <header class="flex flex-row items-center justify-between w-full text-14 text-dark-9 p-8">
+      <h2 class="font-medium text-24">Hotels</h2>
+      <button matButton="filled"
+              class="relative !max-w-1/8 w-full rounded-sm p-2 font-medium hover:bg-green-hover cursor-pointer transition-all duration-200
+                       bg-green text-dark-2 border-green border"
+              (click)="addHotel()">
+        <span class="text-14 font-medium">Add New Hotel</span>
+      </button>
+    </header>
+
+    <div class="w-full h-full">
+      <ag-grid-angular
+        [gridOptions]="gridOptions"
+        [rowData]="rowData()"
+        class="w-full h-full"
+      />
+    </div>
+
+  </section>
 }
