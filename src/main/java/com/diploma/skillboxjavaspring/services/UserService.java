@@ -11,6 +11,8 @@ import com.diploma.skillboxjavaspring.exceptions.UserNameExistedException;
 import com.diploma.skillboxjavaspring.exceptions.UserNameNotFoundException;
 import com.diploma.skillboxjavaspring.mapper.UserMapper;
 import com.diploma.skillboxjavaspring.repositories.UserRepository;
+import com.diploma.skillboxjavaspring.statistics.dto.UserRegisteredEvent;
+import com.diploma.skillboxjavaspring.statistics.service.StatisticsEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final StatisticsEventPublisher statisticsEventPublisher;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -91,6 +94,10 @@ public class UserService {
         user.setRole(Role.USER);
         user.setActive(false);
         User saved = userRepository.save(user);
+
+        statisticsEventPublisher.publishUserRegistered(
+                UserRegisteredEvent.create(saved.getId())
+        );
 
         log.debug("<= Saved user {}", saved);
 

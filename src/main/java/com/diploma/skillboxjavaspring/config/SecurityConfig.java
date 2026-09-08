@@ -1,5 +1,6 @@
 package com.diploma.skillboxjavaspring.config;
 
+import com.diploma.skillboxjavaspring.entity.Role;
 import com.diploma.skillboxjavaspring.services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,14 +46,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers(
-                                        "/api/v1/login",
-                                        "/swagger-ui/**",
-                                        "/v1/api-docs/**"
-                                )
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated()
+                        .requestMatchers(
+                                "/api/v1/login",
+                                "/swagger-ui/**",
+                                "/v1/api-docs/**"
+                        )
+                        .permitAll()
+
+                        .requestMatchers("/api/v1/statistics/**")
+                        .hasRole(Role.ADMIN.name())
+
+                        .anyRequest()
+                        .authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .userDetailsService(userDetailsService);

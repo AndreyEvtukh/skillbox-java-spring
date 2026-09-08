@@ -30,7 +30,7 @@ public class BookingResponseDTO {
      */
     @Schema(
             description = "Unique user identifier",
-            example = "2aa42205-a187-40bd-88d9-e891d713e672"
+            example = "c083ce11-b83f-44cf-9a15-ab1df7f39814"
     )
     private UUID userId;
 
