@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Handles login, logout, and active-status checks for users.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,14 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
+    /**
+     * Authenticates a user and marks the account as active.
+     *
+     * @param request login credentials
+     * @return authenticated user details
+     * @throws InvalidLoginEmailException if no user matches the supplied email
+     * @throws InvalidLoginPasswordException if the supplied password is invalid
+     */
     @Transactional()
     public LoginResponse login(LoginRequest request) {
 
@@ -42,6 +53,13 @@ public class LoginService {
         return new LoginResponse(user.getUsername(), user.getEmail(), user.getRole(), user.getActive());
     }
 
+    /**
+     * Logs out a user and marks the account as inactive.
+     *
+     * @param request logout request containing the user's email
+     * @return logout result
+     * @throws InvalidLoginEmailException if no user matches the supplied email
+     */
     @Transactional()
     public LogoutResponse logout(LogoutRequest request) {
 
@@ -53,6 +71,13 @@ public class LoginService {
         return new LogoutResponse(user.getUsername(), true, user.getActive());
     }
 
+    /**
+     * Checks whether a user account is currently active.
+     *
+     * @param request request containing the user's email
+     * @return the user's current active status and role
+     * @throws InvalidLoginEmailException if no user matches the supplied email
+     */
     @Transactional(readOnly = true)
     public CheckActiveResponse checkStatus(CheckActiveRequest request) {
 

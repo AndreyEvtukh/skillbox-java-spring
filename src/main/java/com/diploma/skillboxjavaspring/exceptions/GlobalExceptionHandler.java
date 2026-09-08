@@ -9,6 +9,9 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.time.LocalDate;
 
 /**
  * Converts application exceptions into consistent HTTP error responses.
@@ -149,5 +152,13 @@ public class GlobalExceptionHandler {
                 HttpStatus.FORBIDDEN,
                 exception.getMessage()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException exception) {
+        if (exception.getRequiredType() == LocalDate.class) {
+            return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid date value: " + exception.getValue());
+        }
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid value for parameter: " + exception.getName());
     }
 }

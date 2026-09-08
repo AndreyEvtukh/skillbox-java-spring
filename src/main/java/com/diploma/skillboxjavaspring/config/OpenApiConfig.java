@@ -12,9 +12,17 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * Configures the OpenAPI metadata and HTTP Basic security scheme.
+ */
 @Configuration
 public class OpenApiConfig {
 
+    /**
+     * Creates the OpenAPI description for the hotel booking API.
+     *
+     * @return the configured OpenAPI model
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()

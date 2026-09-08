@@ -1,6 +1,6 @@
 package com.diploma.skillboxjavaspring.controlers;
 
-import com.diploma.skillboxjavaspring.dto.HotelPageResponseDTO;
+import com.diploma.skillboxjavaspring.dto.hotels.HotelPageResponseDTO;
 import com.diploma.skillboxjavaspring.dto.hotels.*;
 import com.diploma.skillboxjavaspring.exceptions.HotelNotFoundException;
 import com.diploma.skillboxjavaspring.exceptions.InvalidHotelRatingException;

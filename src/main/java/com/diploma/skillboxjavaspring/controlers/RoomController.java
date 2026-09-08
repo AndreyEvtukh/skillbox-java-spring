@@ -1,8 +1,6 @@
 package com.diploma.skillboxjavaspring.controlers;
 
-import com.diploma.skillboxjavaspring.dto.room.RoomRequestDTO;
-import com.diploma.skillboxjavaspring.dto.room.RoomResponseDTO;
-import com.diploma.skillboxjavaspring.dto.room.RoomUpdateDTO;
+import com.diploma.skillboxjavaspring.dto.room.*;
 import com.diploma.skillboxjavaspring.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,11 +12,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -187,5 +191,103 @@ public class RoomController {
     ) {
         roomService.deleteById(ID);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Retrieves a paginated and sorted collection of rooms matching the supplied filters.
+     *
+     * @param name             optional room name filter
+     * @param number           optional room number filter
+     * @param minPrice         optional room minimal price filter
+     * @param maxPrice         optional room maximal price filter
+     * @param maxCapacity      optional maximum room capacity filter
+     * @param hotelIds         optional hotel IDs filter
+     * @param bookingDates     optional booking dates filter
+     * @param page             zero-based page number
+     * @param size             number of rooms per page
+     * @param sort             sorting expression in the format {@code property,direction}
+     * @return a page of rooms matching the supplied criteria
+     */
+    @Operation(
+            summary = "Get rooms",
+            description = """
+                Returns a paginated list of rooms with filtering support.
+                
+                The following filters are supported:
+                - room name;
+                - room number;
+                - room price;
+                - maximum room capacity;
+                - hotel IDs;
+                - booking dates;
+                
+                The response contains the rooms on the current page
+                and the total number of matching rooms.
+                """
+    )
+    @GetMapping
+    public RoomPageResponseDTO getRooms(
+            @Parameter(description = "Room name")
+            @RequestParam(required = false) String name,
+
+            @Parameter(description = "Room number")
+            @RequestParam(required = false) Integer number,
+
+            @Parameter(description = "Room Minimal Price")
+            @RequestParam(required = false) BigDecimal minPrice,
+
+            @Parameter(description = "Room Maximal Price")
+            @RequestParam(required = false) BigDecimal maxPrice,
+
+            @Parameter(description = "Maximum room capacity")
+            @RequestParam(required = false) Integer maxCapacity,
+
+            @Parameter(description = "Hotel ID")
+            @RequestParam(required = false) List<UUID> hotelIds,
+
+            @Parameter(description = "Booking dates")
+            @RequestParam(required = false) List<LocalDate> bookingDates,
+
+            @Parameter(
+                    description = "Page number. Numbering starts from 0",
+                    example = "0"
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "Number of hotels per page",
+                    example = "10"
+            )
+            @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(
+                    description = "Sorting in the format: field,direction. For example: name,asc or rating,desc",
+                    example = "hotelName,asc"
+            )
+            @RequestParam(defaultValue = "name,asc") String sort
+    ) {
+        RoomFilterDTO filter = new RoomFilterDTO(
+                name,
+                number,
+                minPrice,
+                maxPrice,
+                maxCapacity,
+                hotelIds,
+                bookingDates
+        );
+
+        String[] sortParts = sort.split(",", 2);
+
+        Sort.Direction direction = sortParts.length > 1
+                ? Sort.Direction.fromString(sortParts[1])
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(direction, sortParts[0])
+        );
+
+        return roomService.findRooms(filter, pageable);
     }
 }
