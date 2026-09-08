@@ -1,4 +1,4 @@
-package com.diploma.skillboxjavaspring.controlers;
+package com.diploma.skillboxjavaspring.controllers;
 
 import com.diploma.skillboxjavaspring.dto.booking.BookingRequestDTO;
 import com.diploma.skillboxjavaspring.dto.booking.BookingResponseDTO;

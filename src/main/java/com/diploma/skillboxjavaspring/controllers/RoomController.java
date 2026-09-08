@@ -1,4 +1,4 @@
-package com.diploma.skillboxjavaspring.controlers;
+package com.diploma.skillboxjavaspring.controllers;
 
 import com.diploma.skillboxjavaspring.dto.room.*;
 import com.diploma.skillboxjavaspring.services.RoomService;
