@@ -8,17 +8,24 @@ import { ConfirmationDialogController } from '../components/dialogs/confirmation
 import AddHotelDialogComponent from '../components/dialogs/hotel/add-hotel/add-hotel.dialog';
 import { ConfirmationDialogConfig } from '../app.constants';
 import EditHotelDialogComponent from '../components/dialogs/hotel/edit-hotel/edit-hotel.dialog';
+import AddRoomDialogComponent from '../components/dialogs/room/add-room/add-room.dialog';
+import EditRoomDialogComponent from '../components/dialogs/room/edit-room/edit-room.dialog';
+import AddBookingDialogComponent from '../components/dialogs/booking/add-booking/add-booking.dialog';
+import LoginDialogComponent from '../components/dialogs/login/login-dialog';
 
 @Injectable({
   providedIn: "root",
 })
 export class DialogsService {
   protected readonly dialog = inject(MatDialog);
+  private readonly defaultDialogSize = {
+    width: '420px',
+    maxWidth: '95vw'
+  };
 
   public showNoPermissionsDialog() {
     return this.dialog.open(InfoDialogController, {
-      width: '420px',
-      maxWidth: '95vw',
+      ...this.defaultDialogSize,
       closeOnNavigation: false,
       data: {
         title: "User restrictions",
@@ -32,8 +39,7 @@ export class DialogsService {
   public showConfirmationDialog(data: ConfirmationDialogConfig) {
     return this.dialog
       .open(ConfirmationDialogController, {
-        width: '400px',
-        maxWidth: '95vw',
+        ...this.defaultDialogSize,
         closeOnNavigation: false,
         data: {
           ...data
@@ -44,16 +50,14 @@ export class DialogsService {
   // === User START ===//
   public showAddUserDialog() {
     return this.dialog.open(AddUserDialogComponent, {
-      width: '420px',
-      maxWidth: '95vw',
+      ...this.defaultDialogSize,
       closeOnNavigation: false
     });
   }
 
   public showEditUserDialog(data: any) {
     return this.dialog.open(EditUserDialogComponent, {
-      width: '420px',
-      maxWidth: '95vw',
+      ...this.defaultDialogSize,
       closeOnNavigation: false,
       data: {
         ...data.user
@@ -63,8 +67,15 @@ export class DialogsService {
 
   public showRegisterDialog() {
     return this.dialog.open(RegisterDialogComponent, {
-      width: '420px',
-      maxWidth: '95vw',
+      ...this.defaultDialogSize,
+      closeOnNavigation: false,
+    });
+  }
+
+
+  public showLoginialog() {
+    return this.dialog.open(LoginDialogComponent, {
+      ...this.defaultDialogSize,
       closeOnNavigation: false,
     });
   }
@@ -72,20 +83,44 @@ export class DialogsService {
   // === Hotel START ===//
   public showAddHotelDialog() {
     return this.dialog.open(AddHotelDialogComponent, {
-      width: '420px',
-      maxWidth: '95vw',
+      ...this.defaultDialogSize,
       closeOnNavigation: false
     });
   }
 
   public showEditHotelDialog(data: any) {
     return this.dialog.open(EditHotelDialogComponent, {
-      width: '420px',
-      maxWidth: '95vw',
+      ...this.defaultDialogSize,
       closeOnNavigation: false,
       data: {
         ...data.hotel
       }
+    });
+  }
+
+  // === Room START ===//
+  public showAddRoomDialog() {
+    return this.dialog.open(AddRoomDialogComponent, {
+      ...this.defaultDialogSize,
+      closeOnNavigation: false
+    });
+  }
+
+  public showEditRoomDialog(data: any) {
+    return this.dialog.open(EditRoomDialogComponent, {
+      ...this.defaultDialogSize,
+      closeOnNavigation: false,
+      data: {
+        ...data.room
+      }
+    });
+  }
+
+  // === Booking START ===//
+  public showAddBookingDialog() {
+    return this.dialog.open(AddBookingDialogComponent, {
+      ...this.defaultDialogSize,
+      closeOnNavigation: false
     });
   }
 }

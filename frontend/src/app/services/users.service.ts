@@ -1,7 +1,7 @@
-import { inject, Injectable } from "@angular/core";
+import { inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 
 export type User = {
   id?: string;
@@ -23,9 +23,18 @@ export class UsersService {
   private readonly http = inject(HttpClient);
   private readonly url = `http://localhost:8082/api/v1/user`;
 
+  public readonly allUsers: WritableSignal<User[]> = signal<User[]>([]);
+
   // === GET ALL USERS === //
-  public getAll():Observable<Array<User>> {
-    return this.http.get<Array<User>>(this.url + "/all");
+  public getAll(): Observable<Array<User>> {
+    if (this.allUsers().length) {
+      return of(this.allUsers());
+    }
+    return this.http.get<User[]>(`${this.url}/all`).pipe(
+      tap(hotels => {
+        this.allUsers.set(hotels);
+      })
+    );
   }
 
   // === GET === //
@@ -39,18 +48,34 @@ export class UsersService {
   // === CREATE === //
   public add(request: User): Observable<User> {
     const { username, email, password } = request;
-    return this.http.post<User>(this.url, { username, email, password });
+    return this.http.post<User>(this.url, {
+      username,
+      email,
+      password
+    }).pipe(
+      tap(user => this.allUsers.update(users => [...users, user]))
+    );
   }
 
   // === UPDATE === //
   public update(request: User): Observable<User> {
     const { id, username, email, password } = request;
-    return this.http.put<User>(this.url + '/' + id, { username, email, password });
+    return this.http.put<User>(this.url + '/' + id, {
+      username, email, password
+    }).pipe(
+      tap(updatedHotel =>
+        this.allUsers.update(users => users.map(user => user.id === updatedHotel.id ? { ...user, ...updatedHotel } : user))
+      )
+    );
   }
 
   // === DELETE === //
   public delete(request: User): Observable<void> {
     const { id } = request;
-    return this.http.delete<void>(`${this.url}/${id}`);
+    return this.http
+      .delete<void>(`${this.url}/${id}`)
+      .pipe(
+        tap(() => this.allUsers.update(users => users.filter(user => user.id !== id)))
+      );
   }
 }

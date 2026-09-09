@@ -138,7 +138,6 @@ public class UserController {
                     )
             )
     })
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<UserResponseDTO> create(
             @Valid @RequestBody UserRequestDTO userRequestDTO

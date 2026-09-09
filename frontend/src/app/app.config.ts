@@ -8,6 +8,7 @@ import {
   AllCommunityModule,
   ModuleRegistry
 } from 'ag-grid-community';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 ModuleRegistry.registerModules([
   AllCommunityModule
@@ -20,6 +21,7 @@ function initializeApp() {
 export const appConfig: ApplicationConfig = {
 
   providers: [
+    provideNativeDateAdapter(),
     provideHttpClient(
       withInterceptors([
         authInterceptor

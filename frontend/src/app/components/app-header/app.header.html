@@ -89,15 +89,33 @@
   <div class="flex flex-col items-end rounded-md bg-dark-4 overflow-hidden min-w-48">
     <div mat-menu-item
          class="p-4 w-full text-left cursor-default">
-      <p class="text-14 text-end font-light text-dark-9">{{ user()?.username }}</p>
+      <p class="text-14 text-end font-medium text-dark-9">{{ user()?.username }}</p>
       <p class="text-12 text-end font-light text-dark-9">{{ user()?.email }}</p>
       <p class="text-10 text-end font-mono mt-4 text-dark-9">[ Role ]: {{ user()?.role }}</p>
     </div>
+
+    @if (isAdmin()) {
+      <hr class="w-full text-dark-6"/>
+      <div class="text-end p-4 flex flex-col gap-2">
+        <span class="text-14 font-medium text-dark-9">Download statistics</span>
+        <div class="flex flex-row gap-1 text-12 items-center">
+          <button mat-menu-item
+                  class="px-5 py-1.5 rounded-sm w-full text-end  cursor-pointer bg-dark-3 hover:bg-dark-2 transition duration-200 text-dark-9 text-green font-mono"
+                  (click)="download(STATISTICS_DOC_TYPE.CSV)">*.CVS
+          </button>
+          <span class="font-mono text-dark-8">|</span>
+          <button mat-menu-item
+                  class="px-5 py-1.5 rounded-sm w-full text-end  cursor-pointer bg-dark-3 hover:bg-dark-2 transition duration-200 text-dark-9 text-green font-mono"
+                  (click)="download(STATISTICS_DOC_TYPE.PDF)">*.PDF
+          </button>
+        </div>
+      </div>
+    }
     <hr class="w-full text-dark-6"/>
     <button mat-menu-item
-            class="p-4 w-full text-end  cursor-pointer hover:bg-dark-3 transition duration-200"
+            class="p-4 w-full text-center  cursor-pointer hover:bg-dark-3 transition duration-200"
             (click)="goLogout()">
-      <span class="text-12 text-green">Logout</span>
+      <span class="text-14 text-green font-medium uppercase">Logout</span>
     </button>
   </div>
 </mat-menu>

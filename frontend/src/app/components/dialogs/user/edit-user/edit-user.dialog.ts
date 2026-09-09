@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, OnInit, WritableSignal } from '@angular/core';
 import { MatDialogActions } from "@angular/material/dialog";
 import { MatFormField, MatInputModule, MatLabel } from "@angular/material/input";
 import {
@@ -14,7 +14,6 @@ import { MatIcon } from '@angular/material/icon';
 import { NoWhitespaceDirective } from '../../../../directives/no-whitespace.directive';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
-import { UsersService } from '../../../../services/users.service';
 
 @Component({
   selector: 'app-add-user-dialog',
@@ -25,13 +24,7 @@ import { UsersService } from '../../../../services/users.service';
 export default class EditUserDialogComponent extends ApplicationDialogClass implements OnInit {
   protected component: typeof EditUserDialogComponent = EditUserDialogComponent;
 
-  protected usersService: UsersService = inject(UsersService);
-
   protected readonly loading: WritableSignal<boolean> = this.authService.waitUserAddSpinner;
-
-  constructor() {
-    super();
-  }
 
   public ngOnInit(): void {
     this.form = new FormGroup({

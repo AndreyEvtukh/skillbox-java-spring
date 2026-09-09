@@ -13,7 +13,6 @@ import { AUTH } from '../../../../app.constants';
 import { MatIcon } from '@angular/material/icon';
 import { NoWhitespaceDirective } from '../../../../directives/no-whitespace.directive';
 import { ApplicationDialogClass } from '../../app.dialog.class';
-import { UsersService } from '../../../../services/users.service';
 
 @Component({
   selector: 'app-add-user-dialog',
@@ -24,13 +23,8 @@ import { UsersService } from '../../../../services/users.service';
 export default class AddUserDialogComponent extends ApplicationDialogClass implements OnInit {
   protected component: typeof AddUserDialogComponent = AddUserDialogComponent;
   protected override dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<AddUserDialogComponent>, { optional: true });
-  protected usersService: UsersService = inject(UsersService);
 
   protected readonly loading: WritableSignal<boolean> = this.authService.waitUserAddSpinner;
-
-  constructor() {
-    super();
-  }
 
   public ngOnInit(): void {
     this.form = new FormGroup({

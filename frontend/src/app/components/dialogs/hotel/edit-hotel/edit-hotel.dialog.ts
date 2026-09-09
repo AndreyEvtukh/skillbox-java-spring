@@ -12,10 +12,9 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { AUTH } from '../../../../app.constants';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
-import { HotelsService } from '../../../../services/hotels.service';
 
 @Component({
-  selector: 'app-edit-hotel-dialog',
+  selector: 'app-edit-room-dialog',
   imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective],
   templateUrl: `edit-hotel.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
@@ -24,13 +23,7 @@ export default class EditHotelDialogComponent extends ApplicationDialogClass imp
   protected component: typeof EditHotelDialogComponent = EditHotelDialogComponent;
   protected override dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<EditHotelDialogComponent>, { optional: true });
 
-  protected hotelsService: HotelsService = inject(HotelsService);
-
   protected readonly loading: WritableSignal<boolean> = this.authService.waitUserAddSpinner;
-
-  constructor() {
-    super();
-  }
 
   public ngOnInit(): void {
     this.form = new FormGroup({
