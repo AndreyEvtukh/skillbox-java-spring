@@ -1,4 +1,4 @@
-import { Component, effect, inject, } from '@angular/core';
+import { Component, inject, } from '@angular/core';
 import ForRegisteredOnlyController from '../../components/for-registered-only/forRegisteredOnly';
 import { ApplicationPageClass } from '../app.pages.class';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -11,7 +11,6 @@ import { Hotel, HotelsService } from '../../services/hotels.service';
     AgGridAngular
   ],
   selector: 'app-hotels-page',
-  styleUrl: './hotels.page.css',
   templateUrl: './hotels.page.html',
 })
 export default class HotelsPageController extends ApplicationPageClass {
@@ -37,7 +36,7 @@ export default class HotelsPageController extends ApplicationPageClass {
     ratingCol: { flex: 0.4, minWidth: 100, filter: false },
     numOfRatingCol: { flex: 0.4, minWidth: 100, filter: false },
     actionsCol: {
-      sortable: false, filter: false, flex: 0.6, minWidth: 120,
+      sortable: false, filter: false, maxWidth: 130,
       cellRenderer: (params: any) => this.buildActionsCell(params.data.role === "ADMIN")
     }
   };
@@ -67,103 +66,40 @@ export default class HotelsPageController extends ApplicationPageClass {
     onCellClicked: this.onCellClicked.bind(this)
   };
 
-  constructor() {
-    super();
-    effect(() => {
-      const user = this.user();
-
-      if (user === null) {
-        this.rowData.set(null);
-      } else {
-        this.getHotels();
-      }
-    });
+  protected updateContent() {
+    this.hotelsService.getAll().subscribe({
+      next: (data: any) => this.rowData.set(data),
+      error: error => console.log(error)
+    })
   }
 
-  private getHotels() {
-    try {
-      this.http.get(`${this.url}/hotel/all`, { params: { _: Date.now() } }).subscribe(
-        {
-          next: (data: any) => {
-            this.rowData.set(data);
-          },
-          error: error => {
-            console.log(error)
-          }
-        }
-      )
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  onCellClicked(event: any): void {
-    if (event.colDef.field !== 'actions') {
-      return;
-    }
-
-    const target = event.event?.target as HTMLElement;
-    if (target.closest('.edit-btn')) this.editHotel(event.data);
-    if (target.closest('.remove-btn')) this.deleteHotel(event.data);
-  }
-
-  private buildActionsCell(isAdmin: Boolean): string {
-    const editBtn = document.createElement('div');
-    editBtn.className = 'edit-btn leading-relaxed cursor-pointer bg-green-600 hover:bg-green-700 !font-monospace text-dark-9 !rounded-sm !px-2 !py-1 !text-12 transition-all duration-200';
-    editBtn.innerHTML = 'Edit';
-
-    const deleteBtn = document.createElement('div');
-    deleteBtn.className = 'remove-btn leading-relaxed cursor-pointer bg-red-500 hover:bg-red-600 !font-monospace text-dark-9 !rounded-sm !px-2 !py-1 !text-12 transition-all duration-200';
-    deleteBtn.innerHTML = 'Delete';
-
-    if (isAdmin) {
-      deleteBtn.classList.add('invisible');
-    }
-
-    const container = document.createElement('div');
-    container.className = 'flex flex-row w-full h-full items-center justify-center gap-2';
-
-    container.append(editBtn);
-    container.append(deleteBtn);
-
-    const result = document.createElement('div');
-    result.append(container)
-
-    return result.innerHTML;
-  }
-
-  addHotel() {
-    if (!this.isAdmin()) {
-      return this.dialogsService.showNoPermissionsDialog();
-    }
+  protected override onAdd() {
+    const permit: boolean = this.getPermissions();
+    if (!permit) return;
 
     return this.dialogsService.showAddHotelDialog()
       .afterClosed()
       .subscribe(result => {
-        if (result?.ok) {
-          this.getHotels();
-        }
+        if (result?.ok) this.updateContent();
       });
   }
 
-  editHotel(hotel: Hotel) {
-    if (!this.isAdmin()) {
-      return this.dialogsService.showNoPermissionsDialog();
-    }
+  protected override onEdit(hotel: Hotel) {
+    const permit: boolean = this.getPermissions();
+    if (!permit) return;
 
     return this.dialogsService.showEditHotelDialog({ hotel })
       .afterClosed()
       .subscribe(result => {
         if (result?.ok) {
-          this.getHotels();
+          this.updateContent();
         }
       });
   }
 
-  deleteHotel(hotel: Hotel) {
-    if (!this.isAdmin()) {
-      return this.dialogsService.showNoPermissionsDialog();
-    }
+  protected override onDelete(hotel: Hotel) {
+    const permit: boolean = this.getPermissions();
+    if (!permit) return;
 
     const config = {
       html: `Are you sure you want to delete the hotel<p class="font-medium">"${hotel.name}"</p> from the system?`,
@@ -175,7 +111,7 @@ export default class HotelsPageController extends ApplicationPageClass {
       .subscribe(result => {
         if (result?.ok) {
           console.log(`[DELETE Hotel]: ${hotel.id}`);
-          this.getHotels();
+          this.updateContent();
         }
       });
   }

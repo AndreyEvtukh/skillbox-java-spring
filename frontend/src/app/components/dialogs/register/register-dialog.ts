@@ -13,9 +13,9 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { NgClass } from "@angular/common";
 import { AUTH, ICONS } from '../../../app.constants';
 import { MatchPasswordDirective } from '../../../directives/match-password.directive';
-import LoginDialogComponent from '../login/login-dialog';
 import { NoWhitespaceDirective } from '../../../directives/no-whitespace.directive';
 import { AuthService } from '../../../services/auth.service';
+import { DialogsService } from '../../../services/dialogs.service';
 
 @Component({
   selector: 'app-register',
@@ -26,12 +26,12 @@ import { AuthService } from '../../../services/auth.service';
     FormsModule, MatchPasswordDirective, MatProgressSpinnerModule,
     NgClass, NoWhitespaceDirective],
   templateUrl: `register-dialog.html`,
-  styleUrl: 'register-dialog.css',
   animations: [AUTH.STATUS_ANIMATION],
 })
 export default class RegisterDialogComponent {
   protected dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
+  protected readonly dialogsService: DialogsService = inject(DialogsService);
 
   protected showPassword = false;
   protected showConfirmPassword = false;
@@ -93,7 +93,6 @@ export default class RegisterDialogComponent {
   constructor() {
     effect(() => {
       const user = this.authService.user();
-      console.error(user)
       this.user.set(user);
 
       if (user && 'ok' in user && !user.ok) {
@@ -108,13 +107,7 @@ export default class RegisterDialogComponent {
   }
 
   protected goLogin = async (): Promise<void> => {
-    this.dialog.open(LoginDialogComponent, {
-      width: '420px',
-      maxWidth: '95vw',
-      panelClass: 'auth-dialog-panel',
-      closeOnNavigation: false,
-      data: {}
-    });
+    this.dialogsService.showLoginialog();
 
     if (this.dialogRef) this.dialogRef.close('switch');
   }
@@ -127,7 +120,6 @@ export default class RegisterDialogComponent {
     this.authService.register(email, username, password);
 
     this.responseMsg.set(false);
-
   }
 
   protected close = () => this.dialogRef.close();

@@ -3,14 +3,21 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dial
 import { ConfirmationDialogConfig, ICONS } from '../../app.constants';
 import { AuthService } from '../../services/auth.service';
 import { FormGroup } from '@angular/forms';
-import { isObservable } from 'rxjs';
+import { firstValueFrom, isObservable } from 'rxjs';
+import { Hotel, HotelsService } from '../../services/hotels.service';
+import { Room, RoomsService } from '../../services/rooms.service';
+import { User, UsersService } from '../../services/users.service';
 
 @Directive()
 export abstract class ApplicationDialogClass implements OnDestroy {
-  protected readonly data: any  = inject(MAT_DIALOG_DATA);
+  protected readonly data: any = inject(MAT_DIALOG_DATA);
   protected readonly dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<any>, { optional: true });
   protected readonly dialog = inject(MatDialog);
   protected readonly authService = inject(AuthService);
+
+  protected readonly hotelsService: HotelsService = inject(HotelsService);
+  protected readonly roomsService: RoomsService = inject(RoomsService);
+  protected readonly usersService: UsersService = inject(UsersService);
 
   protected abstract component: any;
   protected showPassword = false;
@@ -19,6 +26,11 @@ export abstract class ApplicationDialogClass implements OnDestroy {
   protected readonly user: WritableSignal<any> = this.authService.user;
   protected readonly error: WritableSignal<any> = this.authService.error;
   protected readonly info: WritableSignal<any> = signal<any>(null);
+
+  protected readonly hotels: WritableSignal<Hotel[]> = this.hotelsService.allHotels;
+  protected readonly rooms: WritableSignal<Room[]> = this.roomsService.allRooms;
+  protected readonly users: WritableSignal<User[]> = this.usersService.allUsers;
+
 
   protected readonly ICONS = ICONS;
   protected readonly emailRegExp = new RegExp("^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$");
@@ -34,7 +46,7 @@ export abstract class ApplicationDialogClass implements OnDestroy {
   } as const;
 
   protected config: Signal<ConfirmationDialogConfig> = computed(() => {
-    const config: ConfirmationDialogConfig = {...this.data}
+    const config: ConfirmationDialogConfig = { ...this.data }
     if (!config.title) config.title = 'Confirmation';
     if (!config.confirmButtonText) config.confirmButtonText = 'Confirm';
     if (!config.cancelButtonText) config.cancelButtonText = 'Cancel';
@@ -50,6 +62,20 @@ export abstract class ApplicationDialogClass implements OnDestroy {
   }
 
   constructor() {
+    const q = [];
+    if (!this.users().length && this.user()) {
+      q.push(firstValueFrom(this.usersService.getAll()));
+    }
+
+    if (!this.rooms().length && this.user()) {
+      q.push(firstValueFrom(this.roomsService.getAll()));
+    }
+
+    if (!this.hotels().length && this.user()) {
+      q.push(firstValueFrom(this.hotelsService.getAll()));
+    }
+    Promise.all(q);
+
     effect(() => {
       const user = this.authService.user();
       this.user.set(user);
@@ -60,7 +86,7 @@ export abstract class ApplicationDialogClass implements OnDestroy {
     });
   }
 
-  protected close(result?: {ok : boolean}): void {
+  protected close(result?: { ok: boolean }): void {
     if (this.dialogRef) {
       this.error.set(null)
       this.dialogRef.close(result);
@@ -79,14 +105,9 @@ export abstract class ApplicationDialogClass implements OnDestroy {
 
     if (isObservable(result)) {
       result.subscribe({
-        next: () => {
-          this.dialogRef?.close({ ok: true });
-        },
-        error: error => {
-          console.error(error);
-        }
+        next: () => this.dialogRef?.close({ ok: true }),
+        error: error => console.error(error)
       });
-
       return;
     }
 

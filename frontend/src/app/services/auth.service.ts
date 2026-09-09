@@ -74,9 +74,7 @@ export class AuthService {
 
     const credentials = btoa(`${email}:${password}`);
 
-    this.http.post(this.url + 'login',
-      { email, password },
-    )
+    this.http.post(this.url + 'login', { email, password })
       .subscribe({
         next: (res) => {
           console.log("[LOGIN User]: ", res)
@@ -90,10 +88,10 @@ export class AuthService {
           this.user.set(null);
           this.waitLoginSpinner.set(false);
 
-          const message =
-            error.error?.message ||
-            'Invalid email or password';
-
+          let message = error.error?.message || 'Invalid email or password';
+          if (error.status === 0) {
+            message = "Unable to connect to the server"
+          }
           this.error.set({ ok: false, message, code: error.error.status || 654 });
         }
       });
@@ -101,18 +99,10 @@ export class AuthService {
 
   logout(): void {
     const email = this.user()?.email;
-
-    if (!email) {
-      return;
-    }
+    if (!email) return;
 
     this.waitLoginSpinner.set(true);
-
-    this.http
-      .post<LogoutResponse>(
-        this.url + 'logout',
-        { email }
-      )
+    this.http.post<LogoutResponse>(this.url + 'logout', { email })
       .subscribe({
         next: (res: LogoutResponse) => {
           if (res.ok) {
@@ -168,7 +158,6 @@ export class AuthService {
       )
       .pipe(
         map(res => {
-
           if (!res.ok) {
             sessionStorage.removeItem('auth_credentials');
             localStorage.removeItem(this.storageKey);
@@ -184,28 +173,20 @@ export class AuthService {
           }
 
           const user = JSON.parse(storedUser) as LoginResponse;
+          const updatedUser: LoginResponse = { ...user, active: res.active ?? false };
 
-          const updatedUser: LoginResponse = {
-            ...user,
-            active: res.active ?? false
-          };
-
-          localStorage.setItem(
-            this.storageKey,
-            JSON.stringify(updatedUser)
-          );
+          localStorage.setItem(this.storageKey, JSON.stringify(updatedUser));
           this.waitLoginSpinner.set(false);
 
           console.log("[LOAD User]: ", updatedUser)
+
           return updatedUser;
         }),
 
         catchError(() => {
           sessionStorage.removeItem('auth_credentials');
           localStorage.removeItem(this.storageKey);
-
           this.waitLoginSpinner.set(false);
-
           return of(null);
         })
       );

@@ -54,5 +54,10 @@ export interface ConfirmationDialogConfig {
   onCancel?: () => void;
 }
 
+export const STATISTICS_DOC_TYPE = {
+  CSV: 'csv',
+  PDF: 'pdf'
+} as const;
+
 
 

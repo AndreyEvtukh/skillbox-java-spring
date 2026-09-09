@@ -12,38 +12,43 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { AUTH } from '../../../../app.constants';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
+import { MatOption, MatSelect } from '@angular/material/select';
 
 @Component({
-  selector: 'app-add-room-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective],
-  templateUrl: `add-hotel.dialog.html`,
+  selector: 'app-hotel-dialog',
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective, MatSelect, MatOption],
+  templateUrl: `add-room.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
-export default class AddHotelDialogComponent extends ApplicationDialogClass implements OnInit {
-  protected component: typeof AddHotelDialogComponent = AddHotelDialogComponent;
-  protected override dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<AddHotelDialogComponent>, { optional: true });
+export default class AddRoomDialogComponent extends ApplicationDialogClass implements OnInit {
+  protected component: typeof AddRoomDialogComponent = AddRoomDialogComponent;
+  protected override dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<AddRoomDialogComponent>, { optional: true });
 
   protected readonly loading: WritableSignal<boolean> = this.authService.waitUserAddSpinner;
 
   public ngOnInit(): void {
     this.form = new FormGroup({
-      name: new FormControl("", [
+      category: new FormControl("", [
         Validators.required,
         Validators.minLength(1),
       ]),
-      title: new FormControl("", [
+      number: new FormControl("", [
         Validators.required,
         Validators.minLength(1),
       ]),
-      city: new FormControl("", [
+      price: new FormControl("", [
         Validators.required,
         Validators.minLength(1),
       ]),
-      address: new FormControl("", [
+      maxCapacity: new FormControl("", [
         Validators.required,
         Validators.minLength(1),
       ]),
-      distance: new FormControl("", [
+      description: new FormControl("", [
+        Validators.required,
+        Validators.minLength(1),
+      ]),
+      hotelId: new FormControl("", [
         Validators.required,
         Validators.minLength(1),
       ])
@@ -51,17 +56,11 @@ export default class AddHotelDialogComponent extends ApplicationDialogClass impl
   }
 
   protected add(): void {
-    const { name, title, city, address, distance } = this.form.getRawValue();
+    const { category: name, number, price, maxCapacity, description, hotelId } = this.form.getRawValue();
 
-    this.hotelsService.add({
-      name,
-      title,
-      city,
-      address,
-      distance
-    }).subscribe({
+    this.roomsService.add({ name, number, price, maxCapacity, description, hotelId }).subscribe({
       next: res => {
-        console.log('[ADD Hotel]:', res);
+        console.log('[ADD Room]:', res);
 
         this.removeInfo();
         this.close({ ok: true });
@@ -70,7 +69,7 @@ export default class AddHotelDialogComponent extends ApplicationDialogClass impl
       error: error => {
         console.error(error)
 
-        const message = error.error?.message || 'Failed to add hotel';
+        const message = error.error?.message || 'Failed to add room';
         this.setInfo({ ok: false, message });
       }
     });

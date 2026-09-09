@@ -3,10 +3,25 @@
     <app-for-registered-only-page></app-for-registered-only-page>
   </div>
 } @else if (user()?.email) {
-  <article class="flex flex-col items-center justify-center h-3/4">
-    <div
-      class="flex flex-col w-auto border border-dark-6 rounded-md bg-dark-2 relative z-10 text-14 font-mono text-dark-8 p-12 leading-relaxed">
-      <p class="text-green"> Page is under construction!</p>
+  <section class="flex flex-col items-center h-full p-8">
+
+    <header class="flex flex-row items-center justify-between w-full text-14 text-dark-9 p-8">
+      <h2 class="font-medium text-24">Registered Bookings</h2>
+      <button matButton="filled"
+              class="relative !max-w-1/8 w-full rounded-sm p-2 font-medium hover:bg-green-hover cursor-pointer transition-all duration-200
+                       bg-green text-dark-2 border-green border"
+              (click)="onAdd()">
+        <span class="text-14 font-medium">Book Now</span>
+      </button>
+    </header>
+
+    <div class="w-full h-full">
+      <ag-grid-angular
+        [gridOptions]="gridOptions"
+        [rowData]="rowData()"
+        class="w-full h-full"
+      />
     </div>
-  </article>
+
+  </section>
 }
