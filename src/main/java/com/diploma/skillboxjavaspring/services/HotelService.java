@@ -94,7 +94,7 @@ public class HotelService {
     /**
      * Updates an existing hotel with the values supplied in the request DTO.
      *
-     * @param ID              the unique identifier of the hotel to update
+     * @param ID the unique identifier of the hotel to update
      * @param hotelRequestDTO the data containing the hotel's updated values
      * @return a response DTO representing the updated hotel
      * @throws HotelNotFoundException if no hotel exists with the supplied identifier
