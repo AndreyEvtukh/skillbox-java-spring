@@ -1,4 +1,4 @@
-import { Component, inject, WritableSignal, } from '@angular/core';
+import { Component, inject, signal, WritableSignal, } from '@angular/core';
 import ForRegisteredOnlyController from "../../components/for-registered-only/forRegisteredOnly";
 import { ApplicationPageClass } from '../app.pages.class';
 import { Hotel, HotelsService } from '../../services/hotels.service';
@@ -22,24 +22,25 @@ import { FormatDatePipe } from '../../pipes/formatDatePipe';
   templateUrl: './booking.page.html',
 })
 export default class BookingPageController extends ApplicationPageClass {
-  protected bookingService: BookingService = inject(BookingService);
-  protected hotelsService: HotelsService = inject(HotelsService);
-  protected roomsService: RoomsService = inject(RoomsService);
-  protected usersService: UsersService = inject(UsersService);
+  protected readonly bookingService: BookingService = inject(BookingService);
+  protected readonly hotelsService: HotelsService = inject(HotelsService);
+  protected readonly roomsService: RoomsService = inject(RoomsService);
+  protected readonly usersService: UsersService = inject(UsersService);
 
-  protected datePipe: FormatDatePipe = inject(FormatDatePipe);
+  protected readonly datePipe: FormatDatePipe = inject(FormatDatePipe);
+  protected readonly loadData = signal(false);
 
-  protected hotels: WritableSignal<Hotel[]> = this.hotelsService.allHotels;
-  protected rooms: WritableSignal<Room[]> = this.roomsService.allRooms;
-  protected users: WritableSignal<User[]> = this.usersService.allUsers;
+  protected readonly hotels: WritableSignal<Hotel[]> = this.hotelsService.allHotels;
+  protected readonly rooms: WritableSignal<Room[]> = this.roomsService.allRooms;
+  protected readonly users: WritableSignal<User[]> = this.usersService.allUsers;
 
   protected readonly columnDefs: ColDef[] = [
     { field: 'userName', headerName: 'User Name', type: 'nameCol', sort: 'asc' },
-    { field: 'email', headerName: 'User Email', type: 'emailCol' },
-    { field: 'category', headerName: 'Room Category', type: 'categoryCol' },
-    { field: 'number', headerName: 'Room Number', type: 'numberCol' },
-    { field: 'hotel', headerName: 'Hotel', type: 'hotelCol' },
-    { field: 'city', headerName: 'City', type: 'cityCol' },
+    { field: 'email', headerName: 'User Email' },
+    { field: 'category', headerName: 'Room Category' },
+    { field: 'number', headerName: 'Room Number' },
+    { field: 'hotel', headerName: 'Hotel' },
+    { field: 'city', headerName: 'City' },
     { field: 'checkIn', headerName: 'Check In', type: 'dateCol' },
     { field: 'checkOut', headerName: 'Check Out', type: 'dateCol' }
   ];
@@ -71,42 +72,55 @@ export default class BookingPageController extends ApplicationPageClass {
   }
 
   protected async updateContent() {
-    const q = [];
-    if (!this.users().length) {
-      q.push(firstValueFrom(this.usersService.getAll()));
+    if (this.loadData() || this.rowData()) return;
+
+    this.loadData.set(true);
+
+    try {
+      const q = [];
+      if (!this.users().length) {
+        q.push(firstValueFrom(this.usersService.getAll()));
+      }
+
+      if (!this.rooms().length) {
+        q.push(firstValueFrom(this.roomsService.getAll()));
+      }
+
+      if (!this.hotels().length) {
+        q.push(firstValueFrom(this.hotelsService.getAll()));
+      }
+      await Promise.all(q);
+
+      if (
+        !this.users().length ||
+        !this.rooms().length ||
+        !this.hotels().length
+      ) {
+        return;
+      }
+
+      const data = await firstValueFrom(this.bookingService.getAll());
+      const rowData = data.map((item: Booking & any) => {
+        const user = this.users().find(user => user.id === item.userId)!;
+        const room = this.rooms().find(room => room.id === item.roomId)!;
+        const hotel = this.hotels().find(hotel => hotel.id === room.hotelId)!;
+
+        return {
+          ...item,
+          email: user.email,
+          userName: user.username,
+          category: room.name,
+          number: room.number,
+          hotel: hotel.name,
+          city: hotel.city
+        };
+      });
+      this.rowData.set(rowData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.loadData.set(false);
     }
-
-    if (!this.rooms().length) {
-      q.push(firstValueFrom(this.roomsService.getAll()));
-    }
-
-    if (!this.hotels().length) {
-      q.push(firstValueFrom(this.hotelsService.getAll()));
-    }
-    await Promise.all(q);
-
-    this.bookingService.getAll().subscribe({
-      next: (data: Array<Booking>) => {
-        const rowData = data.map((item: any) => {
-          const user: User = this.users().find(user => user.id === item.userId)!;
-          item.email = user.email;
-          item.userName = user.username;
-
-          const room: Room = this.rooms().find(room => room.id === item.roomId)!;
-          item.category = room.name;
-          item.number = room.number;
-
-          const hotel: Hotel = this.hotels().find(hotel => hotel.id === room!.hotelId)!;
-          item.hotel = hotel.name;
-          item.city = hotel.city;
-
-          return item;
-        });
-
-        this.rowData.set(rowData)
-      },
-      error: error => console.log(error)
-    })
   }
 
   protected override onAdd() {

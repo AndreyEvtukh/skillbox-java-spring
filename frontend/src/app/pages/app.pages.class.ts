@@ -6,7 +6,7 @@ import { DialogsService } from '../services/dialogs.service';
 
 @Directive()
 export abstract class ApplicationPageClass implements OnDestroy {
-  protected readonly rowData: WritableSignal<any> = signal([]);
+  protected readonly rowData: WritableSignal<any> = signal(null);
   protected readonly dialogsService: DialogsService = inject(DialogsService);
 
   protected readonly authService = inject(AuthService);
@@ -19,12 +19,10 @@ export abstract class ApplicationPageClass implements OnDestroy {
 
   constructor() {
     effect(() => {
-      const user = this.user();
-
-      if (user === null) {
-        this.rowData.set(null);
-      } else {
+      if (this.user() && !this.rowData()) {
         this.updateContent();
+      } else if (!this.user()) {
+        this.rowData.set(null);
       }
     });
   }
@@ -81,6 +79,5 @@ export abstract class ApplicationPageClass implements OnDestroy {
   protected abstract updateContent(): void;
 
   ngOnDestroy() {
-
   }
 }

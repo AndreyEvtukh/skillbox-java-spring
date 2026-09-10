@@ -14,7 +14,7 @@ import { Hotel, HotelsService } from '../../services/hotels.service';
   templateUrl: './hotels.page.html',
 })
 export default class HotelsPageController extends ApplicationPageClass {
-  protected hotelsService: HotelsService = inject(HotelsService);
+  protected readonly hotelsService: HotelsService = inject(HotelsService);
 
   protected readonly columnDefs: ColDef[] = [
     { field: 'name', headerName: 'Name', type: 'nameCol', sort: 'asc' },

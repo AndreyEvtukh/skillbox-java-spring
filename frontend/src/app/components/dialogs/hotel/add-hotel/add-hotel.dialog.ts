@@ -12,10 +12,11 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { AUTH } from '../../../../app.constants';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
+import { ErrorToastController } from '../../error-toast/error-toast';
 
 @Component({
   selector: 'app-add-room-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective],
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective, ErrorToastController],
   templateUrl: `add-hotel.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
@@ -63,7 +64,7 @@ export default class AddHotelDialogComponent extends ApplicationDialogClass impl
       next: res => {
         console.log('[ADD Hotel]:', res);
 
-        this.removeInfo();
+        // this.removeInfo();
         this.close({ ok: true });
       },
 
@@ -71,7 +72,7 @@ export default class AddHotelDialogComponent extends ApplicationDialogClass impl
         console.error(error)
 
         const message = error.error?.message || 'Failed to add hotel';
-        this.setInfo({ ok: false, message });
+        this.error.set(message);
       }
     });
   }

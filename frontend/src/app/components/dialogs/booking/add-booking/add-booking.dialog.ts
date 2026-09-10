@@ -131,11 +131,9 @@ export default class AddBookingDialogComponent extends ApplicationDialogClass im
 
     const result = await firstValueFrom(this.bookingService.add({ userId, roomId, checkIn, checkOut }));
     if (result?.ok) {
-      this.removeInfo();
       this.close(result);
     } else {
-      const message = 'Failed to book';
-      this.setInfo({ ok: false, message });
+      this.error.set('Failed to book a room');
     }
   }
 
@@ -146,29 +144,4 @@ export default class AddBookingDialogComponent extends ApplicationDialogClass im
 
     return `${year}-${month}-${day}`;
   }
-
-  // const { name, title, city, address, distance } = this.form.getRawValue();
-
-  //   this.hotelsService.add({
-  //     name,
-  //     title,
-  //     city,
-  //     address,
-  //     distance
-  //   }).subscribe({
-  //     next: res => {
-  //       console.log('[ADD Hotel]:', res);
-  //
-  //       this.removeInfo();
-  //       this.close({ ok: true });
-  //     },
-  //
-  //     error: error => {
-  //       console.error(error)
-  //
-  //       const message = error.error?.message || 'Failed to add hotel';
-  //       this.setInfo({ ok: false, message });
-  //     }
-  //   });
-  // }
 }

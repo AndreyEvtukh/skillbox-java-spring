@@ -13,10 +13,11 @@ import { AUTH } from '../../../../app.constants';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { ErrorToastController } from '../../error-toast/error-toast';
 
 @Component({
   selector: 'app-hotel-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective, MatSelect, MatOption],
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective, MatSelect, MatOption, ErrorToastController],
   templateUrl: `add-room.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
@@ -62,7 +63,7 @@ export default class AddRoomDialogComponent extends ApplicationDialogClass imple
       next: res => {
         console.log('[ADD Room]:', res);
 
-        this.removeInfo();
+        // this.removeInfo();
         this.close({ ok: true });
       },
 
@@ -70,7 +71,7 @@ export default class AddRoomDialogComponent extends ApplicationDialogClass imple
         console.error(error)
 
         const message = error.error?.message || 'Failed to add room';
-        this.setInfo({ ok: false, message });
+        this.error.set(message);
       }
     });
   }

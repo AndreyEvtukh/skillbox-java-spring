@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, Signal, signal, WritableSignal } from '@angular/core';
-import { MatDialog, MatDialogActions, MatDialogRef } from "@angular/material/dialog";
+import { MatDialogActions, MatDialogRef } from "@angular/material/dialog";
 import { MatFormField, MatInputModule, MatLabel } from "@angular/material/input";
 import {
   FormControl,
@@ -11,11 +11,12 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { NgClass } from "@angular/common";
-import { AUTH, ICONS } from '../../../app.constants';
+import { AUTH } from '../../../app.constants';
 import { MatchPasswordDirective } from '../../../directives/match-password.directive';
 import { NoWhitespaceDirective } from '../../../directives/no-whitespace.directive';
-import { AuthService } from '../../../services/auth.service';
 import { DialogsService } from '../../../services/dialogs.service';
+import { ApplicationDialogClass } from '../app.dialog.class';
+import { ErrorToastController } from '../error-toast/error-toast';
 
 @Component({
   selector: 'app-register',
@@ -24,30 +25,16 @@ import { DialogsService } from '../../../services/dialogs.service';
     MatDialogActions, MatLabel, MatFormField,
     MatInputModule, MatFormFieldModule, ReactiveFormsModule,
     FormsModule, MatchPasswordDirective, MatProgressSpinnerModule,
-    NgClass, NoWhitespaceDirective],
+    NgClass, NoWhitespaceDirective, ErrorToastController],
   templateUrl: `register-dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
-export default class RegisterDialogComponent {
-  protected dialog = inject(MatDialog);
-  private readonly authService = inject(AuthService);
+export default class RegisterDialogComponent extends ApplicationDialogClass {
+  protected component: typeof RegisterDialogComponent = RegisterDialogComponent;
+  protected override dialogRef: MatDialogRef<any> | null = inject(MatDialogRef<RegisterDialogComponent>, { optional: true });
   protected readonly dialogsService: DialogsService = inject(DialogsService);
 
-  protected showPassword = false;
-  protected showConfirmPassword = false;
-  protected FORM_FIELD = {
-    USERNAME: "userName",
-    EMAIL: "email",
-    PASSWORD: "password",
-    CONFIRM_PASSWORD: "confirmPassword",
-  } as const;
-
-  private dialogRef = inject(MatDialogRef<RegisterDialogComponent>);
-
-  private emailRegExp = new RegExp("^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$");
-  private passwordRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]{8,}$/;
-
-  protected form: FormGroup = new FormGroup({
+  protected override form: FormGroup = new FormGroup({
     [this.FORM_FIELD.USERNAME]: new FormControl("", [
       Validators.required,
       Validators.minLength(1),
@@ -69,8 +56,8 @@ export default class RegisterDialogComponent {
     ])
   });
 
-  protected user: WritableSignal<any> = signal<any>(null);
   protected readonly loading: WritableSignal<boolean> = this.authService.waitLoginSpinner;
+
   protected response: WritableSignal<any> = signal<any>({});
   protected responseMsg: WritableSignal<boolean> = signal<boolean>(false);
   protected formSignal = signal({
@@ -85,22 +72,11 @@ export default class RegisterDialogComponent {
     return Object.keys(f).some(key => !key.trim().length);
   });
 
-  get emailIsInvalid() {
-    const {errors} = this.form.controls["email"];
-    return errors?.["email"] || errors?.["pattern"];
-  }
-
   constructor() {
+    super();
+
     effect(() => {
-      const user = this.authService.user();
-      this.user.set(user);
-
-      if (user && 'ok' in user && !user.ok) {
-        this.responseMsg.set(true);
-        this.response.set({...this.user()});
-      }
-
-      if (user && 'email' in user && user.email) {
+      if (this.user()?.email) {
         this.close();
       }
     });
@@ -108,30 +84,21 @@ export default class RegisterDialogComponent {
 
   protected goLogin = async (): Promise<void> => {
     this.dialogsService.showLoginialog();
-
     if (this.dialogRef) this.dialogRef.close('switch');
   }
 
   protected register = () => {
-    const email = this.form.controls[this.FORM_FIELD.EMAIL].value;
-    const username = this.form.controls[this.FORM_FIELD.USERNAME].value;
-    const password = this.form.controls[this.FORM_FIELD.PASSWORD].value;
+    const controls = this.form.controls;
+    const email = controls[this.FORM_FIELD.EMAIL].value;
+    const username = controls[this.FORM_FIELD.USERNAME].value;
+    const password = controls[this.FORM_FIELD.PASSWORD].value;
 
     this.authService.register(email, username, password);
-
     this.responseMsg.set(false);
   }
-
-  protected close = () => this.dialogRef.close();
 
   protected doBlurredInput(input: string) {
     this.form.controls[input].markAsTouched();
     this.form.controls[input].markAsDirty();
   }
-
-  protected dismissResponseMsg() {
-    this.responseMsg.set(false);
-  }
-
-  protected readonly ICONS = ICONS;
 }
