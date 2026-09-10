@@ -14,12 +14,12 @@ import { MatIcon } from '@angular/material/icon';
 import { NoWhitespaceDirective } from '../../../directives/no-whitespace.directive';
 import { ApplicationDialogClass } from '../app.dialog.class';
 import { DialogsService } from '../../../services/dialogs.service';
+import { ErrorToastController } from '../error-toast/error-toast';
 
 @Component({
   selector: 'app-login-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective],
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective, ErrorToastController],
   templateUrl: `login-dialog.html`,
-  styleUrl: 'login-dialog.css',
   animations: [AUTH.STATUS_ANIMATION],
 })
 export default class LoginDialogComponent extends ApplicationDialogClass implements OnInit {
@@ -33,16 +33,7 @@ export default class LoginDialogComponent extends ApplicationDialogClass impleme
     super();
 
     effect(() => {
-      const user = this.authService.user();
-      const error = this.error();
-      this.user.set(user);
-
-
-      if (error && 'ok' in error && !error.ok) {
-        this.setInfo({ ...this.error() });
-      }
-
-      if (user && 'email' in user && user.email) {
+      if (this.user()?.email) {
         this.close();
       }
     });
@@ -64,12 +55,10 @@ export default class LoginDialogComponent extends ApplicationDialogClass impleme
 
   protected signIn() {
     const { email, password } = this.form.getRawValue();
-    this.removeInfo();
     this.authService.login(email, password);
   }
 
   protected async goRegister() {
-    this.removeInfo();
     this.authService.user.set(null);
     this.dialogsService.showRegisterDialog();
     if (this.dialogRef) this.dialogRef.close('switch');

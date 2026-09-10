@@ -1,12 +1,17 @@
-import { computed, Directive, effect, inject, OnDestroy, signal, Signal, WritableSignal } from '@angular/core';
+import { computed, Directive, inject, OnDestroy, signal, Signal, WritableSignal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ConfirmationDialogConfig, ICONS } from '../../app.constants';
 import { AuthService } from '../../services/auth.service';
 import { FormGroup } from '@angular/forms';
-import { firstValueFrom, isObservable } from 'rxjs';
+import { isObservable } from 'rxjs';
 import { Hotel, HotelsService } from '../../services/hotels.service';
 import { Room, RoomsService } from '../../services/rooms.service';
 import { User, UsersService } from '../../services/users.service';
+
+export interface ErrorResponse {
+  ok: boolean;
+  message: string;
+}
 
 @Directive()
 export abstract class ApplicationDialogClass implements OnDestroy {
@@ -25,7 +30,7 @@ export abstract class ApplicationDialogClass implements OnDestroy {
 
   protected readonly user: WritableSignal<any> = this.authService.user;
   protected readonly error: WritableSignal<any> = this.authService.error;
-  protected readonly info: WritableSignal<any> = signal<any>(null);
+  protected readonly info: WritableSignal<ErrorResponse | null> = signal<ErrorResponse | null>(null);
 
   protected readonly hotels: WritableSignal<Hotel[]> = this.hotelsService.allHotels;
   protected readonly rooms: WritableSignal<Room[]> = this.roomsService.allRooms;
@@ -61,31 +66,6 @@ export abstract class ApplicationDialogClass implements OnDestroy {
     return errors?.["email"] || errors?.["pattern"];
   }
 
-  constructor() {
-    const q = [];
-    if (!this.users().length && this.user()) {
-      q.push(firstValueFrom(this.usersService.getAll()));
-    }
-
-    if (!this.rooms().length && this.user()) {
-      q.push(firstValueFrom(this.roomsService.getAll()));
-    }
-
-    if (!this.hotels().length && this.user()) {
-      q.push(firstValueFrom(this.hotelsService.getAll()));
-    }
-    Promise.all(q);
-
-    effect(() => {
-      const user = this.authService.user();
-      this.user.set(user);
-
-      if (this.error()) {
-        this.setInfo({ ok: false, message: this.error() });
-      }
-    });
-  }
-
   protected close(result?: { ok: boolean }): void {
     if (this.dialogRef) {
       this.error.set(null)
@@ -114,15 +94,6 @@ export abstract class ApplicationDialogClass implements OnDestroy {
     this.dialogRef?.close({ ok: true });
   }
 
-  protected setInfo(data: any) {
-    this.info.set(data);
-  }
-
-  protected removeInfo() {
-    this.info.set(false);
-  }
-
   ngOnDestroy() {
-    // this.dialogRef?.close('destroyed');
   }
 }

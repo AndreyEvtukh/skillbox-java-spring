@@ -10,7 +10,6 @@ import { ApplicationDialogClass } from '../app.dialog.class';
         MatIcon
     ],
     templateUrl: `confirmation.html`,
-    styleUrl: 'confirmation.css',
 })
 export class ConfirmationDialogController extends ApplicationDialogClass {
     protected component: typeof ConfirmationDialogController = ConfirmationDialogController;

@@ -26,7 +26,7 @@ export default class RoomsPageController extends ApplicationPageClass {
     { field: 'price', headerName: 'Price, $', type: 'priceCol' },
     { field: 'maxCapacity', headerName: 'Max Capacity', type: 'maxCapCol' },
     { field: 'hotel', headerName: 'Hotel', type: 'hotelCol' },
-    { field: 'bookingPeriods', headerName: 'Booking Periods', type: 'bookingPeriodsCol' },
+    // { field: 'bookingPeriods', headerName: 'Booking Periods', type: 'bookingPeriodsCol' },
     { field: 'actions', headerName: 'Actions', type: 'actionsCol' }
   ];
 

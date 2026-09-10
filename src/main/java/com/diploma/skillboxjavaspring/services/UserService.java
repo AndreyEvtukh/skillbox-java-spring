@@ -121,6 +121,9 @@ public class UserService {
                 .orElseThrow(() -> new UserIDNotFoundException(id));
 
         userMapper.updateEntity(request, user);
+        user.setPasswordHash(
+                passwordEncoder.encode(request.getPassword())
+        );
         User updated = userRepository.save(user);
         UserResponseDTO response = userMapper.toResponseDTO(updated);
         response.setEvent("Edit");

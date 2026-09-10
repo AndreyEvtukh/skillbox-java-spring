@@ -1,7 +1,8 @@
-import { inject, Injectable, signal, WritableSignal } from "@angular/core";
+import { effect, inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, of, tap } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export type Room = {
   id?: string;
@@ -20,12 +21,25 @@ export type Room = {
 export class RoomsService {
   protected readonly dialog = inject(MatDialog);
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly url = `http://localhost:8082/api/v1/room`;
 
   public readonly allRooms: WritableSignal<Room[]> = signal<Room[]>([]);
+  public readonly user = this.authService.user;
+
+  constructor() {
+    effect(() => {
+      if (!this.user()) {
+        this.allRooms.set([]);
+      }
+    });
+  }
+
 
   // === GET ALL ROOMS === //
   public getAll(): Observable<Array<Room>> {
+    if (!this.user()) return of();
+
     if (this.allRooms().length) {
       return of(this.allRooms());
     }
@@ -45,6 +59,8 @@ export class RoomsService {
 
   // === CREATE === //
   public add(request: Room): Observable<Room> {
+    if (!this.user()) return of();
+
     const { name, hotelId, description, maxCapacity, price, number } = request;
     return this.http.post<Room>(this.url, {
       name,
@@ -60,6 +76,8 @@ export class RoomsService {
 
   // === UPDATE === //
   public update(request: Room): Observable<Room> {
+    if (!this.user()) return of();
+
     const { id, name, hotelId, description, maxCapacity, price, number } = request;
     return this.http.put<Room>(`${this.url}/${id}`, {
       name: name.trim(),
@@ -83,6 +101,8 @@ export class RoomsService {
 
   // === DELETE === //
   public delete(request: Room): Observable<void> {
+    if (!this.user()) return of();
+
     const { id } = request;
     return this.http.delete<void>(`${this.url}/${id}`).pipe(
       tap(() => this.allRooms.update(hotels => hotels.filter(hotel => hotel.id !== id)))

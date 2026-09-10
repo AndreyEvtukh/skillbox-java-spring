@@ -137,16 +137,8 @@
     <div class="relative flex flex-row justify-center items-center !h-6 !w-full">
       @if (loading()) {
         <mat-spinner @spinerAnimation class="absolute !h-6 !w-6"></mat-spinner>
-      } @else if (info()?.ok === false && info().message) {
-        <p @spinerAnimation
-           class="flex justify-center text-center max-w-2xs w-full font-monospace absolute whitespace-pre-line
-               text-green py-2 px-4 bg-dark-1 rounded-sm border border-dark-6 text-10 text-dark-8"
-           (click)="$event.stopImmediatePropagation()">
-          {{ info().message }}
-          <span
-            class="top-1/2 transform -translate-y-1/2 absolute right-1 w-4 h-4 bg-dark-3 flex justify-center items-center rounded-full cursor-pointer"
-            (click)="removeInfo()">&times;</span>
-        </p>
+      } @else if (error()) {
+        <app-error-toast></app-error-toast>
       }
     </div>
   </div>

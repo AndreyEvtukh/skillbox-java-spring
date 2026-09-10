@@ -1,7 +1,8 @@
-import { inject, Injectable, signal, WritableSignal } from "@angular/core";
+import { effect, inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export type User = {
   id?: string;
@@ -21,12 +22,24 @@ export type User = {
 export class UsersService {
   protected readonly dialog = inject(MatDialog);
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly url = `http://localhost:8082/api/v1/user`;
 
   public readonly allUsers: WritableSignal<User[]> = signal<User[]>([]);
+  public readonly user = this.authService.user;
+
+  constructor() {
+    effect(() => {
+      if (!this.user()) {
+        this.allUsers.set([]);
+      }
+    });
+  }
 
   // === GET ALL USERS === //
   public getAll(): Observable<Array<User>> {
+    if (!this.user()) return of();
+
     if (this.allUsers().length) {
       return of(this.allUsers());
     }
@@ -47,6 +60,8 @@ export class UsersService {
 
   // === CREATE === //
   public add(request: User): Observable<User> {
+    if (!this.user()) return of();
+
     const { username, email, password } = request;
     return this.http.post<User>(this.url, {
       username,
@@ -59,6 +74,8 @@ export class UsersService {
 
   // === UPDATE === //
   public update(request: User): Observable<User> {
+    if (!this.user()) return of();
+
     const { id, username, email, password } = request;
     return this.http.put<User>(this.url + '/' + id, {
       username, email, password
@@ -71,6 +88,8 @@ export class UsersService {
 
   // === DELETE === //
   public delete(request: User): Observable<void> {
+    if (!this.user()) return of();
+
     const { id } = request;
     return this.http
       .delete<void>(`${this.url}/${id}`)

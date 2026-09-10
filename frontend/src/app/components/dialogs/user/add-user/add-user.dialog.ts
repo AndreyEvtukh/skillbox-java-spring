@@ -13,10 +13,11 @@ import { AUTH } from '../../../../app.constants';
 import { MatIcon } from '@angular/material/icon';
 import { NoWhitespaceDirective } from '../../../../directives/no-whitespace.directive';
 import { ApplicationDialogClass } from '../../app.dialog.class';
+import { ErrorToastController } from '../../error-toast/error-toast';
 
 @Component({
   selector: 'app-add-user-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective],
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective, ErrorToastController],
   templateUrl: `add-user.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
@@ -51,7 +52,7 @@ export default class AddUserDialogComponent extends ApplicationDialogClass imple
       next: res => {
         console.log('[ADD User]:', res);
 
-        this.removeInfo();
+        // this.removeInfo();
         this.close({ ok: true });
       },
 
@@ -59,7 +60,7 @@ export default class AddUserDialogComponent extends ApplicationDialogClass imple
         console.error(error)
 
         const message = error.error?.message || 'Failed to add User';
-        this.setInfo({ ok: false, message });
+        this.error.set(message);
       }
     });
   }

@@ -37,7 +37,7 @@ public class UserRequestDTO {
      * The encoded password for the user.
      */
     @NotBlank(message = "Password can not be blank")
-    @Schema(description = "User password hash", example = "alksjfdaskfldjskdjfhskdj256")
+    @Schema(description = "User password hash", example = "Password")
     private String password;
 
 }

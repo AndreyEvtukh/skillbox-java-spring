@@ -14,10 +14,11 @@ import { MatIcon } from '@angular/material/icon';
 import { NoWhitespaceDirective } from '../../../../directives/no-whitespace.directive';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
+import { ErrorToastController } from '../../error-toast/error-toast';
 
 @Component({
   selector: 'app-add-user-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective, MarkControlOnBlurDirective],
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MatIcon, NoWhitespaceDirective, MarkControlOnBlurDirective, ErrorToastController],
   templateUrl: `edit-user.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
@@ -53,7 +54,7 @@ export default class EditUserDialogComponent extends ApplicationDialogClass impl
         next: res => {
           console.log('[UPDATE User]:', res);
 
-          this.removeInfo();
+          // this.removeInfo();
           this.close({ ok: true });
         },
 
@@ -61,7 +62,7 @@ export default class EditUserDialogComponent extends ApplicationDialogClass impl
           console.error(error)
 
           const message = error.error?.message || 'Failed to update User';
-          this.setInfo({ ok: false, message });
+          this.error.set(message);
         }
       });
   }

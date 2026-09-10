@@ -2,6 +2,7 @@ import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, of, catchError } from 'rxjs';
 import { User } from './users.service';
+import { ErrorMessageService } from './error-message.service';
 
 export interface LoginResponse {
   username: string;
@@ -27,6 +28,8 @@ export type CheckActiveResponse = {
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly errorMessageService: ErrorMessageService = inject(ErrorMessageService);
+
   private readonly url = `http://localhost:8082/api/v1/`;
   private readonly storageKey = 'auth_user';
 
@@ -34,36 +37,22 @@ export class AuthService {
   public readonly waitUserAddSpinner: WritableSignal<boolean> = signal(false);
 
   public readonly user: WritableSignal<User | null> = signal<User | null>(null);
-  public readonly error = signal<any | null>(null);
+  public readonly error = this.errorMessageService.loginError;
 
   constructor() {
     this.waitLoginSpinner.set(true);
-    this.loadUser().subscribe(user => {
-      this.user!.set(user as User);
-    });
+    this.loadUser().subscribe(user => this.user!.set(user as User));
   }
 
   register(email: string, username: string, password: string) {
     this.waitLoginSpinner.set(true);
+    this.error.set(null);
 
-    const config = { email, username, password }
     this.http
-      .post<LoginResponse>(this.url + "user", config)
+      .post<LoginResponse>(this.url + "user", { email, username, password })
       .subscribe({
-
-          next: (res: LoginResponse) => {
-            this.user!.set(res);
-            this.waitLoginSpinner.set(false);
-            console.log("[User]: ", res)
-            localStorage.setItem(this.storageKey, JSON.stringify(res));
-          },
-
-          error: error => {
-            const message = error.error?.message || error.message;
-            this.user!.set({ ok: false, message });
-            this.waitLoginSpinner.set(false);
-            this.error.set(message);
-          },
+          next: () => this.login(email, password),
+          error: error => this.onLoginFail(error),
         }
       );
   }
@@ -74,26 +63,11 @@ export class AuthService {
 
     const credentials = btoa(`${email}:${password}`);
 
-    this.http.post(this.url + 'login', { email, password })
+    this.http
+      .post<LoginResponse>(this.url + 'login', { email, password })
       .subscribe({
-        next: (res) => {
-          console.log("[LOGIN User]: ", res)
-          this.user.set(res);
-          this.waitLoginSpinner.set(false);
-          sessionStorage.setItem('auth_credentials', credentials);
-          localStorage.setItem(this.storageKey, JSON.stringify(res));
-        },
-
-        error: (error) => {
-          this.user.set(null);
-          this.waitLoginSpinner.set(false);
-
-          let message = error.error?.message || 'Invalid email or password';
-          if (error.status === 0) {
-            message = "Unable to connect to the server"
-          }
-          this.error.set({ ok: false, message, code: error.error.status || 654 });
-        }
+        next: (res: LoginResponse) => this.onLoginSuccess(res, credentials),
+        error: error => this.onLoginFail(error),
       });
   }
 
@@ -116,11 +90,7 @@ export class AuthService {
         },
 
         error: error => {
-          const message =
-            error.error?.message ||
-            error.message ||
-            'Logout failed';
-
+          const message = error.error?.message || error.message || 'Logout failed';
           this.waitLoginSpinner.set(false);
           this.error.set(message);
         }
@@ -190,5 +160,23 @@ export class AuthService {
           return of(null);
         })
       );
+  }
+
+  private onLoginSuccess(res: LoginResponse, credentials: string) {
+    this.user!.set(res);
+    this.waitLoginSpinner.set(false);
+    console.log("[SUCCESS][Login]: ", res)
+    localStorage.setItem(this.storageKey, JSON.stringify(res));
+    sessionStorage.setItem('auth_credentials', credentials);
+  }
+
+  private onLoginFail(error: any) {
+    let message = error.error?.message || error.message;
+    if (error.status === 0) {
+      message = "Unable to connect to the server";
+    }
+    this.user!.set(null);
+    this.waitLoginSpinner.set(false);
+    this.error.set(message);
   }
 }

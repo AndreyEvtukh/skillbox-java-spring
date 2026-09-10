@@ -13,10 +13,11 @@ import { AUTH } from '../../../../app.constants';
 import { ApplicationDialogClass } from '../../app.dialog.class';
 import { MarkControlOnBlurDirective } from '../../../../directives/mark-control-on-blur.directive';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { ErrorToastController } from '../../error-toast/error-toast';
 
 @Component({
   selector: 'app-edit-room-dialog',
-  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective, MatSelect, MatOption],
+  imports: [MatDialogActions, MatLabel, MatFormField, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatProgressSpinner, MarkControlOnBlurDirective, MatSelect, MatOption, ErrorToastController],
   templateUrl: `edit-room.dialog.html`,
   animations: [AUTH.STATUS_ANIMATION],
 })
@@ -63,7 +64,7 @@ export default class EditRoomDialogComponent extends ApplicationDialogClass impl
       next: res => {
         console.log('[UPDATE Room]:', res);
 
-        this.removeInfo();
+        // this.removeInfo();
         this.close({ ok: true });
       },
 
@@ -71,7 +72,7 @@ export default class EditRoomDialogComponent extends ApplicationDialogClass impl
         console.error(error)
 
         const message = error.error?.message || 'Failed to add room';
-        this.setInfo({ ok: false, message });
+        this.error.set(message);
       }
     });
   }
