@@ -1,17 +1,28 @@
 package com.diploma.skillboxjavaspring.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * Configures the OpenAPI metadata and HTTP Basic security scheme.
+ */
 @Configuration
 public class OpenApiConfig {
 
+    /**
+     * Creates the OpenAPI description for the hotel booking API.
+     *
+     * @return the configured OpenAPI model
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -29,8 +40,18 @@ public class OpenApiConfig {
                                 .email("andrey.evtukh@gmail.com")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8082/")
+                                .url("http://localhost:8082")
                                 .description("Development server")
-                ));
+                ))
+                .components(new Components()
+                        .addSecuritySchemes(
+                                "basicAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("basic")
+                                        .description("Basic Authentication")
+                        )
+                )
+                .addSecurityItem(new SecurityRequirement().addList("basicAuth"));
     }
 }

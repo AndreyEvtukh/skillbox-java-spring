@@ -1,0 +1,208 @@
+<section
+  class="bg-dark-2 flex flex-col items-center h-full px-8 pt-8 pb-4 overflow-hidden rounded-md border border-dark-3 justify-center text-dark-9">
+  <div class="flex flex-col items-center justify-center w-full gap-8 text-14">
+    <h2 class="uppercase font-medium">Book Room</h2>
+
+    <form class="flex flex-col justify-center gap-0 max-w-2xs w-full" [formGroup]="form"
+          [class.waiting]="loading()">
+
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "User name" }}</mat-label>
+        <mat-select
+          id="user"
+          formControlName="user"
+          class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4 h-full"
+          panelClass="!border !border-dark-8 !rounded-sm !bg-dark-2"
+          appMarkControlOnBlur
+          required>
+          <div class="text-dark-8">
+            @for (user of users(); track user.id) {
+              <mat-option [value]="user.id"
+                          class="!min-h-10 hover:!bg-dark-3"> {{ user.username }}&#160;({{ user.email }})
+              </mat-option>
+            }
+          </div>
+        </mat-select>
+        @if (form.controls['user'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['user'].errors?.['required']) {
+              <small> {{ "User name" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10">
+        <mat-label>{{ "Hotel" }}</mat-label>
+        <mat-select
+          id="hotel"
+          formControlName="hotel"
+          class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4 h-full"
+          panelClass="!border !border-dark-8 !rounded-sm !bg-dark-2"
+          (valueChange)="onHotelSet($event)"
+          appMarkControlOnBlur
+          required>
+          <div class="text-dark-8">
+            @for (hotel of hotels(); track hotel.id) {
+              <mat-option [value]="hotel.id" class="!min-h-10 hover:!bg-dark-3"> {{ hotel.name }}&#160;({{ hotel.city }}
+                )
+              </mat-option>
+            }
+          </div>
+        </mat-select>
+        @if (form.controls['hotel'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['hotel'].errors?.['required']) {
+              <small> {{ "Hotel" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10 transition-all duration-200"
+                      [ngClass]="{'opacity-30': form.controls['category'].disabled}">
+        <mat-label>{{ "Room category" }}</mat-label>
+        <mat-select
+          id="category"
+          formControlName="category"
+          class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4 h-full"
+          panelClass="!border !border-dark-8 !rounded-sm !bg-dark-2"
+          (valueChange)="onCategorySet($event)"
+          appMarkControlOnBlur
+          required>
+          <div class="text-dark-8">
+            @for (category of availableCategories; track category.id) {
+              <mat-option [value]="category.id" class="!min-h-10 hover:!bg-dark-3"> {{ category.id }}</mat-option>
+            }
+          </div>
+        </mat-select>
+        @if (form.controls['category'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['category'].errors?.['required']) {
+              <small> {{ "Category" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full relative z-10 transition-all duration-200"
+                      [ngClass]="{'opacity-30': form.controls['number'].disabled}">
+        <mat-label>{{ "Room number" }}</mat-label>
+        <mat-select
+          id="number"
+          formControlName="number"
+          class="!border !border-dark-8 !p-2 !rounded-sm !bg-dark-4 h-full"
+          panelClass="!border !border-dark-8 !rounded-sm !bg-dark-2"
+          (valueChange)="onNumberSet()"
+          appMarkControlOnBlur
+          required>
+          <div class="text-dark-8">
+            @for (number of availableRoomNumbers; track number.id) {
+              <mat-option [value]="number.id" class="!min-h-10 hover:!bg-dark-3"> {{ number.id }}</mat-option>
+            }
+          </div>
+        </mat-select>
+        @if (form.controls['number'].invalid) {
+          <mat-error class="error">
+            @if (form.controls['number'].errors?.['required']) {
+              <small> {{ "Room number" }} {{ "is required" }} </small>
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+
+      <div class="flex gap-4 w-full">
+
+        <!-- Check In -->
+        <mat-form-field class="w-1/2 relative z-10 transition-opacity duration-200"
+                        [class.opacity-30]="form.controls['checkIn'].disabled">
+
+          <mat-label>Check In</mat-label>
+
+          <div
+            class="flex flex-row !border !border-dark-8 !p-2 !rounded-sm !bg-dark-4 h-full items-center justify-between ">
+            <input matInput
+                   readonly
+                   [min]="today"
+                   [max]="form.controls['checkOut'].value"
+                   formControlName="checkIn"
+                   [matDatepicker]="checkInPicker"
+                   appMarkControlOnBlur
+                   required>
+            <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+          </div>
+          <mat-datepicker #checkInPicker
+                          panelClass="dark-datepicker !rounded-sm !bg-dark-2 text-dark-8 !text-12"></mat-datepicker>
+
+          @if (form.controls['checkIn'].hasError('required')) {
+            <mat-error> Check In date is required</mat-error>
+          }
+
+        </mat-form-field>
+
+        <!-- Check Out -->
+        <mat-form-field class="w-1/2 relative z-10 transition-opacity duration-200"
+                        [class.opacity-30]="form.controls['checkOut'].disabled">
+
+          <mat-label>Check Out</mat-label>
+
+          <div
+            class="flex flex-row !border !border-dark-8 !p-2 !rounded-sm !bg-dark-4 h-full items-center justify-between">
+            <input matInput
+                   readonly
+                   formControlName="checkOut"
+                   [matDatepicker]="checkOutPicker"
+                   [min]="minCheckOutDate"
+                   appMarkControlOnBlur
+                   required>
+            <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+          </div>
+
+          <mat-datepicker #checkOutPicker
+                          panelClass="dark-datepicker !rounded-sm !bg-dark-2 text-dark-8 !text-12"></mat-datepicker>
+
+          @if (form.controls['checkOut'].hasError('required')) {
+            <mat-error> Check Out date is required</mat-error>
+          }
+
+        </mat-form-field>
+
+      </div>
+
+
+    </form>
+
+    <div class="relative flex flex-row justify-center items-center !h-6 !w-full">
+      @if (loading()) {
+        <mat-spinner @spinerAnimation class="absolute !h-6 !w-6"></mat-spinner>
+      } @else if (error()) {
+<!--        <p @spinerAnimation-->
+<!--           class="flex justify-center text-center max-w-2xs w-full font-monospace absolute whitespace-pre-line-->
+<!--               text-green py-2 px-4 bg-dark-1 rounded-sm border border-dark-6 text-10 text-dark-8"-->
+<!--           (click)="$event.stopImmediatePropagation()">-->
+<!--          {{ info().message }}-->
+<!--          <span-->
+<!--            class="top-1/2 transform -translate-y-1/2 absolute right-1 w-4 h-4 bg-dark-3 flex justify-center items-center rounded-full cursor-pointer"-->
+<!--            (click)="removeInfo()">&times;</span>-->
+<!--        </p>-->
+      }
+    </div>
+  </div>
+
+  <mat-dialog-actions align="end" class="w-full flex flex-col justify-center gap-6">
+    <button matButton="filled"
+            class="uppercase max-w-2xs h-10 w-full rounded-sm p-2 !font-medium cursor-pointer transition-all duration-200
+                   disabled:bg-dark-3 disabled:text-dark-6 disabled:!border-dark-6 disabled:cursor-not-allowed
+                   bg-green text-dark-2 border-green border text-14"
+            [disabled]="form.invalid"
+            (click)="add()"
+    >
+      <span class="text-14">Book</span>
+    </button>
+
+    <button matButton="filled" class="cursor-pointer text-14" (click)="close()"><span class="text-14">Cancel</span>
+    </button>
+
+  </mat-dialog-actions>
+</section>

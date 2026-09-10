@@ -1,0 +1,90 @@
+package com.diploma.skillboxjavaspring.services;
+
+import com.diploma.skillboxjavaspring.dto.*;
+import com.diploma.skillboxjavaspring.dto.login.LoginRequest;
+import com.diploma.skillboxjavaspring.dto.login.LoginResponse;
+import com.diploma.skillboxjavaspring.dto.logout.LogoutRequest;
+import com.diploma.skillboxjavaspring.dto.logout.LogoutResponse;
+import com.diploma.skillboxjavaspring.entity.User;
+import com.diploma.skillboxjavaspring.exceptions.InvalidLoginEmailException;
+import com.diploma.skillboxjavaspring.exceptions.InvalidLoginPasswordException;
+import com.diploma.skillboxjavaspring.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Handles login, logout, and active-status checks for users.
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class LoginService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+
+    /**
+     * Authenticates a user and marks the account as active.
+     *
+     * @param request login credentials
+     * @return authenticated user details
+     * @throws InvalidLoginEmailException if no user matches the supplied email
+     * @throws InvalidLoginPasswordException if the supplied password is invalid
+     */
+    @Transactional()
+    public LoginResponse login(LoginRequest request) {
+
+        User user = userRepository
+                .findByEmail(request.email())
+                .orElseThrow(() -> new InvalidLoginEmailException(request.email()));
+
+        if (!passwordEncoder.matches(
+                request.password(),
+                user.getPasswordHash()
+        )) {
+            throw new InvalidLoginPasswordException();
+        }
+        log.info("=> updateStatus 1");
+        userService.updateStatus(user.getId(), true);
+        return new LoginResponse(user.getUsername(), user.getEmail(), user.getRole(), user.getActive());
+    }
+
+    /**
+     * Logs out a user and marks the account as inactive.
+     *
+     * @param request logout request containing the user's email
+     * @return logout result
+     * @throws InvalidLoginEmailException if no user matches the supplied email
+     */
+    @Transactional()
+    public LogoutResponse logout(LogoutRequest request) {
+
+        User user = userRepository
+                .findByEmail(request.email())
+                .orElseThrow(() -> new InvalidLoginEmailException(request.email()));
+
+        userService.updateStatus(user.getId(), false);
+        return new LogoutResponse(user.getUsername(), true, user.getActive());
+    }
+
+    /**
+     * Checks whether a user account is currently active.
+     *
+     * @param request request containing the user's email
+     * @return the user's current active status and role
+     * @throws InvalidLoginEmailException if no user matches the supplied email
+     */
+    @Transactional(readOnly = true)
+    public CheckActiveResponse checkStatus(CheckActiveRequest request) {
+
+        User user = userRepository
+                .findByEmail(request.email())
+                .orElseThrow(() -> new InvalidLoginEmailException(request.email()));
+        log.debug("=> {}", user.getEmail());
+        return new CheckActiveResponse(user.getEmail(), user.getActive(), user.getRole(), true);
+    }
+}

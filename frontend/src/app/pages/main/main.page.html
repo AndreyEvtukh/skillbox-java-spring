@@ -1,0 +1,151 @@
+<section class="flex flex-col w-full h-full">
+  <article
+    class="relative z-10 flex flex-row w-full px-8 max-h-[calc(40rem)]
+    before:bg-dark-3 before:h-full before:absolute before:-left-96 before:-right-96 before:z-0 gap-8">
+    <div class="w-2/5 xl:w-1/2 flex flex-col z-10 justify-center  py-8">
+      <div class="flex">
+        <div class="px-4 py-2 rounded-xs bg-green text-dark-1 font-medium text-10">Full-stack</div>
+      </div>
+      <h1 class="font-medium text-dark-9">Hotel Booking<p class="!text-24 font-light">book your stay quickly and
+        easily</p></h1>
+      <p class="text-14 text-dark-8 pl-4 xl:pl-8 2xl:pl-16 ">Explore available rooms, check their details and availability, and choose the
+        dates that work best for you. Create an account to make bookings and manage your reservations.</p>
+    </div>
+
+    <div class="w-3/5 xl:w-1/2 flex flex-col z-10  py-8">
+      <article
+        class="border border-dark-6 rounded-md bg-dark-2 h-full relative z-10 w-full
+            text-12 font-monospace font-mono text-dark-6">
+        <div class="scrolled vertical flex flex-col gap-4 m-0.5 h-[calc(100%_-_0.5rem)] overflow-y-auto p-8">
+          <p class="mt-2 text-12 text-dark-9 text-green">
+            Hotel Booking is a full-stack hotel reservation platform that allows
+            users to search for hotels, explore available rooms, check room
+            details, and make bookings for a selected period.
+          </p>
+
+          <p class="text-12 text-dark-8 px-2">
+            The platform provides hotel search and filtering by rating, room
+            availability, booking management, and user ratings from 1 to 5.
+            Users can choose a suitable room, select their dates, and manage
+            their reservations.
+          </p>
+
+          <div class="mt-6">
+            <h2 class="text-16 text-dark-9 text-green"> Main Features </h2>
+
+            <div class="mt-2 grid grid-cols-3 gap-2">
+              @for (item of mainFeatures(); track item.index) {
+                <div class="rounded-md bg-dark-1 px-3 py-5">
+                  <h3 class="text-14 text-dark-9"> {{ item.title }} </h3>
+                  <p class="mt-2 text-12 leading-relaxed text-dark-8">{{ item.text }} </p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Backend / Frontend -->
+          <div class="mt-8 grid grid-cols-2 gap-8">
+
+            <!-- Backend -->
+            <div>
+              <div class="flex items-center justify-between">
+                <h2 class="text-16 text-dark-9"> Backend </h2>
+                <span class="rounded-xs bg-green px-3 py-1 text-10 font-medium text-dark-1">Java</span>
+              </div>
+
+              <p class="mt-3 text-12 text-dark-8"> REST API and business logic </p>
+
+              <div class="mt-6 flex flex-wrap gap-2">
+                @for (item of BE_Tech(); track $index) {
+                  <span class="rounded-xs bg-dark-3 px-3 py-1 text-12 text-dark-8">{{ item }}</span>
+                }
+              </div>
+
+              <p class="mt-6 text-12 font-light leading-relaxed text-dark-8">
+                The backend is responsible for business logic, data persistence, authentication and authorization, hotel
+                and room management, bookings, ratings, and statistics.
+              </p>
+
+            </div>
+
+            <div class="border-dashed border-dark-6 border-l pl-4 -ml-4">
+              <div class="flex items-center justify-between">
+                <h2 class="text-16 text-dark-9"> Frontend </h2>
+                <span class="rounded-xs bg-green px-3 py-1 text-10 font-medium text-dark-1">Angular</span>
+              </div>
+
+              <p class="mt-3 text-12 text-dark-8"> Modern single-page application </p>
+
+              <div class="mt-6 flex flex-wrap gap-2">
+                @for (item of FE_Tech(); track $index) {
+                  <span class="rounded-xs bg-dark-3 px-3 py-1 text-12 text-dark-8">{{ item }}</span>
+                }
+              </div>
+
+              <p class="mt-6 text-12 font-light leading-relaxed text-dark-8">
+                The frontend provides the user interface for hotel search, room browsing, booking management,
+                authentication, and the administrative CMS.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- Architecture -->
+          <div class="mt-8">
+
+            <h2 class="text-16 text-dark-9"> Architecture </h2>
+            <p class="mt-3 text-12 text-dark-8"> The application follows a client-server architecture. </p>
+
+
+            <div class="mt-8 flex items-center justify-center gap-2">
+
+              <div class="flex min-h-28 w-64 flex-col items-center justify-center rounded-md bg-dark-1">
+                <span class="text-16 text-dark-9">Angular 22</span>
+                <span class="mt-1 text-12 text-green"> Frontend</span>
+              </div>
+
+              <div class="text-24 text-dark-6">→</div>
+
+              <div class="flex min-h-28 w-64 flex-col items-center justify-center rounded-md bg-dark-1">
+                <span class="text-16 text-dark-9">Spring Boot</span>
+                <span class="mt-1 text-12 text-green">REST API</span>
+              </div>
+
+              <div class="text-24 text-dark-6">→</div>
+
+              <div class="flex min-h-28 w-64 flex-col items-center justify-center rounded-md bg-dark-1">
+                <span class="text-16 text-dark-9">PostgreSQL 18</span>
+                <span class="mt-1 text-12 text-green">Database</span>
+              </div>
+
+            </div>
+
+
+            <p class="mx-auto mt-8 max-w-3xl text-center text-12 leading-relaxed text-dark-6">
+              Docker and Docker Compose are used to simplify the development and deployment environment.
+            </p>
+
+          </div>
+        </div>
+      </article>
+    </div>
+
+  </article>
+
+  <article class="text-dark-9 px-8 font-light text-14 relative z-10 flex flex-row h-[calc(100%_-_40rem)]">
+    <div class="w-3/12 flex flex-col h-full justify-center ml-16 gap-4 -mt-8">
+      <p class="text-12 text-dark-8">About</p>
+      <h4 class="text-16"><span class="text-green font-medium">Hello!</span> <span class="block">I’m Andrey Evtukh!</span></h4>
+    </div>
+    <p class="w-5/12 flex flex-col h-full justify-center text-12">
+      Senior Full-Stack Developer with 12+ years of experience building web applications. I specialize in designing
+      scalable architectures, optimizing performance, and creating intuitive UIs that genuinely improve the user
+      experience.
+    </p>
+
+  </article>
+</section>
+
+
